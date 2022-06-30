@@ -1,0 +1,16 @@
+{
+  "name": "@2hire/bleintsdk-types",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "types": "src/index.d.ts",
+  "files": [
+    "src"
+  ],
+  "repository": "https://github.com/2hire/BLEIntSDK.git",
+  "author": "2hire <info@2hire.io> (https://github.com/2hire)",
+  "homepage": "https://github.com/2hire/BLEIntSDK.git#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "IonicBleIntSdkExample",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,21 @@
+<ion-content [fullscreen]="true">
+  <div id="container">
+    <ion-button id="create" expand="block" color="warning" (click)="create()"
+      >Create</ion-button
+    >
+    <ion-input placeholder="accessToken" id="token" clearInput [(ngModel)]="accessToken"></ion-input>
+
+    <ion-button expand="block" color="success" (click)="startSequence()"
+      >Start sequence</ion-button
+    >
+    <ion-button expand="block" color="danger" (click)="endSequence()"
+      >End session</ion-button
+    >
+    <ion-button expand="block" (click)="sendCommand('start')"
+      >Start command</ion-button
+    >
+    <ion-button expand="block" (click)="sendCommand('stop')"
+      >Stop command</ion-button
+    >
+  </div>
+</ion-content>

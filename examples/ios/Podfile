@@ -1,0 +1,15 @@
+use_frameworks!
+
+platform :ios, '13.0'
+install! 'cocoapods', :deterministic_uuids => false
+
+target 'BLEIntSDK_Example' do
+  pod '2hire-BLEIntSDK', :path => '../..', :testspecs => ['Tests'] 
+  pod '2hire-K1', :path =>  '../..'
+  pod '2hire-secp256k1', :path =>  '../..'
+
+  target 'BLEIntSDK_Tests' do
+    inherit! :search_paths
+
+  end
+end

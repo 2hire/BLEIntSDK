@@ -1,0 +1,7 @@
+configurations.all {
+    resolutionStrategy {
+        dependencySubstitution {
+            substitute module('io.twohire:bleintsdk') using project(':twohire-bleintsdk-android')
+        }
+    }
+}

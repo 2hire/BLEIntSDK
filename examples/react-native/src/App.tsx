@@ -1,0 +1,270 @@
+/* eslint-disable react-native/no-inline-styles */
+import * as SDK from '@2hire/react-native-bleintsdk';
+import {
+  MOCK_BOARD_COMMAND_END_SESSION,
+  MOCK_BOARD_COMMAND_LOCATE,
+  MOCK_BOARD_COMMAND_NOOP,
+  MOCK_BOARD_COMMAND_START,
+  MOCK_BOARD_COMMAND_STOP,
+  MOCK_BOARD_IDENTIFIER,
+  MOCK_BOARD_PUBKEY,
+  TWOAA_CLIENT_ID,
+  TWOAA_SECRET,
+  USE_MOCK,
+} from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as React from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import {Alert, PermissionsAndroid, Platform, TextInput, View} from 'react-native';
+import styled from 'styled-components';
+import {Button} from './components/Button';
+import {TwoAAClient} from './utils/TwoAAHelper';
+
+const Commands: SDK.Commands = {
+  start: MOCK_BOARD_COMMAND_START,
+  stop: MOCK_BOARD_COMMAND_STOP,
+  noop: MOCK_BOARD_COMMAND_NOOP,
+  locate: MOCK_BOARD_COMMAND_LOCATE,
+  end_session: MOCK_BOARD_COMMAND_END_SESSION,
+};
+
+enum ActionType {
+  Create,
+  Connect,
+  StartCommand,
+  StopCommand,
+  End,
+}
+
+const StorageVehicleIdKey = '@2hire-vehicle-id';
+
+export default function App() {
+  const [accessDataToken, setAccessDataToken] = useState<string>('');
+  const [loadingAction, setLoadingAction] = useState<ActionType | null>(null);
+  const [vehicleId, setVehicleId] = useState<string>('');
+
+  const identifier = useRef(MOCK_BOARD_IDENTIFIER);
+  const sessionId = useRef<number | null>(null);
+  const reports = useRef<string[]>([]);
+
+  useEffect(() => {
+    if (!USE_MOCK) {
+      AsyncStorage.getItem(StorageVehicleIdKey)
+        .then((value) => {
+          if (value != null) {
+            setVehicleId(value);
+          } else {
+            console.log(`${StorageVehicleIdKey} is null`);
+          }
+        })
+        .catch(console.error);
+    }
+  }, []);
+
+  const handleResponse = useCallback<(res: Promise<SDK.CommandResponse>) => Promise<void>>(async (p) => {
+    try {
+      const res = await p;
+
+      if (res?.payload) {
+        reports.current.push(res.payload);
+      }
+
+      showAlert(res);
+    } catch (e) {
+      showErrorAlert(e);
+    } finally {
+      setLoadingAction(null);
+    }
+  }, []);
+
+  return (
+    <Wrapper>
+      {USE_MOCK ? (
+        <MyTextInput value={accessDataToken} onChangeText={setAccessDataToken} />
+      ) : (
+        <MyTextInput placeholder="Vehicle ID" value={vehicleId} onChangeText={setVehicleId} />
+      )}
+      <MyButton
+        color="#FF9500"
+        disabled={loadingAction !== null || (!USE_MOCK && vehicleId.length === 0)}
+        isLoading={loadingAction === ActionType.Create}
+        title="Create"
+        style={{marginBottom: 'auto'}}
+        onPress={async () => {
+          if (Platform.OS === 'android') {
+            requestAndroidPermissions();
+          }
+
+          setLoadingAction(ActionType.Create);
+
+          try {
+            if (USE_MOCK) {
+              const response = await SDK.sessionSetup(accessDataToken, Commands, MOCK_BOARD_PUBKEY);
+
+              console.log(response);
+            } else {
+              const _vehicleId = vehicleId.trim();
+
+              await AsyncStorage.setItem(StorageVehicleIdKey, _vehicleId);
+              await TwoAAClient.auth(TWOAA_CLIENT_ID, TWOAA_SECRET);
+
+              const {
+                data: {accessDataToken: token, commands, publicKeyBox, macAddressBox, ...data},
+              } = await TwoAAClient.startOfflineSession(_vehicleId);
+
+              reports.current = [];
+              sessionId.current = data.sessionId;
+
+              console.log({token, commands, publicKeyBox, macAddressBox, ...data});
+
+              const response = await SDK.sessionSetup(
+                token,
+                {
+                  start: '',
+                  stop: '',
+                  noop: '',
+                  locate: '',
+                  end_session: '',
+                  ...commands,
+                },
+                publicKeyBox,
+              );
+              identifier.current = macAddressBox;
+
+              console.log(response);
+            }
+          } catch (e) {
+            showErrorAlert(e);
+          } finally {
+            setLoadingAction(null);
+          }
+        }}
+      />
+      <MyButton
+        color="#35C759"
+        disabled={loadingAction !== null}
+        isLoading={loadingAction === ActionType.Connect}
+        title="Start sequence"
+        onPress={() => {
+          setLoadingAction(ActionType.Connect);
+
+          handleResponse(SDK.connect(identifier.current));
+        }}
+      />
+      <MyButton
+        color="#FF3B2F"
+        disabled={loadingAction !== null}
+        isLoading={loadingAction === ActionType.End}
+        title="End session"
+        onPress={async () => {
+          setLoadingAction(ActionType.End);
+
+          await handleResponse(SDK.endSession());
+
+          if (!USE_MOCK && sessionId.current !== null) {
+            try {
+              const response = await TwoAAClient.endOfflineSession(vehicleId, sessionId.current, reports.current);
+
+              console.log(response);
+            } catch (e) {
+              showErrorAlert(e);
+            } finally {
+              setLoadingAction(null);
+            }
+          }
+        }}
+      />
+      <MyButton
+        color="#007AFF"
+        disabled={loadingAction !== null}
+        isLoading={loadingAction === ActionType.StartCommand}
+        title="Start command"
+        onPress={async () => {
+          setLoadingAction(ActionType.StartCommand);
+
+          await handleResponse(SDK.sendCommand('start'));
+        }}
+      />
+      <MyButton
+        color="#007AFF"
+        disabled={loadingAction !== null}
+        isLoading={loadingAction === ActionType.StopCommand}
+        title="Stop command"
+        style={{marginBottom: 'auto'}}
+        onPress={async () => {
+          setLoadingAction(ActionType.StopCommand);
+
+          await handleResponse(SDK.sendCommand('stop'));
+        }}
+      />
+    </Wrapper>
+  );
+}
+
+const showAlert = (res: SDK.CommandResponse | boolean) =>
+  Alert.alert(
+    'Command Response',
+    res === null
+      ? 'Command response is null'
+      : `Command was ${(typeof res === 'boolean' ? res : res.success) ? 'successful' : 'unsuccessful'}`.concat(
+          typeof res !== 'boolean' ? ` with additional data: ${res.payload}` : '',
+        ),
+  );
+
+const showErrorAlert = (error: unknown) => {
+  console.error(error);
+
+  if (error instanceof Error) {
+    Alert.alert('An error occurred', error.message, [
+      {
+        style: 'default',
+        text: 'Show More',
+        onPress: () => Alert.alert('An error occurred', JSON.stringify(error)),
+      },
+      {
+        text: 'OK',
+      },
+    ]);
+  } else {
+    Alert.alert('An error occurred', JSON.stringify(error));
+  }
+};
+
+const requestAndroidPermissions = () =>
+  PermissionsAndroid.requestMultiple([
+    PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+    PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+    PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  ])
+    .then(console.log)
+    .catch(console.error);
+
+const Wrapper = styled(View)`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  padding-top: 64px;
+`;
+
+const MyTextInput = styled(TextInput)`
+  border-radius: 4px;
+  border: 1px solid black;
+  margin-bottom: 16px;
+  margin-top: auto;
+  min-height: 24px;
+  text-align: center;
+  width: 100%;
+`;
+
+const MyButton = styled(Button).attrs({textColor: '#ffffff', indicatorColor: '#666666'})<{color?: string}>`
+  align-items: center;
+  background-color: ${({color}) => color ?? 'transparent'};
+  border-radius: 8px;
+  justify-content: center;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  min-height: 42px;
+  width: 100%;
+`;

@@ -1,0 +1,3 @@
+[submodule "Example/Libraries/K1"]
+	path = Example/Libraries/K1
+	url = https://github.com/2hire/K1.git

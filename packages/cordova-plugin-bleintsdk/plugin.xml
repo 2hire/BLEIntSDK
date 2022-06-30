@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-bleintsdk" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>2hire-cordova-bleintsdk</name>
+    <js-module name="BLEIntSDKCordova" src="dist/BLEIntSDKCordova.js">
+        <clobbers target="cordova.plugins.BLEIntSDKCordova" />
+    </js-module>
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="BLEIntSDKCordova">
+                <param name="android-package" value="io.twohire.cordova.bleintsdk.BLEIntSDKCordova" />
+            </feature>
+        </config-file>
+        <config-file parent="/*" target="AndroidManifest.xml" />
+        <source-file src="src/android/BLEIntSDKCordova.kt" target-dir="src/main/kotlin/io/twohire/cordova/bleintsdk" />
+        <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+    </platform>
+    <platform name="ios">
+        <config-file parent="/*" target="config.xml">
+            <feature name="BLEIntSDKCordova">
+                <param name="ios-package" value="BLEIntSDKCordova" />
+            </feature>
+        </config-file>
+        <header-file src="src/ios/BLEIntSDKCordova-BridgingHeader.h" />
+        <source-file src="src/ios/BLEIntSDKCordova.swift" />
+        <podspec>
+            <config>
+                <source url="https://github.com/CocoaPods/Specs.git" />
+            </config>
+            <pods use-frameworks="true">
+                <pod name="2hire-BLEIntSDK" />
+            </pods>
+        </podspec>
+    </platform>
+</plugin>

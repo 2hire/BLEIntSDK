@@ -1,0 +1,32 @@
+diff --git a/node_modules/cordova-android/lib/builders/ProjectBuilder.js b/node_modules/cordova-android/lib/builders/ProjectBuilder.js
+index f92e358..74e27a4 100644
+--- a/node_modules/cordova-android/lib/builders/ProjectBuilder.js
++++ b/node_modules/cordova-android/lib/builders/ProjectBuilder.js
+@@ -140,7 +140,8 @@ class ProjectBuilder {
+         return {
+             libs: findAllUniq(data, /^\s*android\.library\.reference\.\d+=(.*)(?:\s|$)/mg),
+             gradleIncludes: findAllUniq(data, /^\s*cordova\.gradle\.include\.\d+=(.*)(?:\s|$)/mg),
+-            systemLibs: findAllUniq(data, /^\s*cordova\.system\.library\.\d+=(.*)(?:\s|$)/mg)
++            systemLibs: findAllUniq(data, /^\s*cordova\.system\.library\.\d+=(.*)(?:\s|$)/mg),
++            customLibs: findAllUniq(data,  /^\s*custom\.library\.reference\.\d+=(.*)(?:\s|$)/mg)
+         };
+     }
+ 
+@@ -195,6 +196,17 @@ class ProjectBuilder {
+             return str;
+         });
+ 
++        if (propertiesObj.customLibs.length > 0) {
++          settingsGradlePaths.push(propertiesObj.customLibs.map(function (p) {
++            const [libName, path] = p.split(":");
++
++            var str = 'include ":' + libName + '"\n';
++            str += 'project(":' + libName + '").projectDir = new File("' + path + '")\n';
++
++            return str;
++          }))
++        }
++
+         // Update subprojects within settings.gradle.
+         fs.writeFileSync(path.join(this.root, 'settings.gradle'),
+             '// GENERATED FILE - DO NOT EDIT\n' +
