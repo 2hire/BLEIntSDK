@@ -1,0 +1,4 @@
+before_install:
+  - cd "packages/sdk/android"
+  - sdk install java 11-zulu
+  - sdk use java 11-zulu
