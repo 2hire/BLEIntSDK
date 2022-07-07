@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/bleintsdk-types",
+    "packages/react-native-bleintsdk",
+    "packages/cordova-plugin-bleintsdk"
+  ]
+}

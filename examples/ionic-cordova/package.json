@@ -10,7 +10,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "patch-package && cordova plugin add ../../packages/cordova-plugin-bleintsdk --link"
+    "postinstall": "patch-package"
   },
   "private": true,
   "dependencies": {

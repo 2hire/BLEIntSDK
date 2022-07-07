@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = '2hire-BLEIntSDK'
-  s.version          = '0.1.0'
+  s.version          = '0.0.2-beta.0'
   s.summary          = 'SDK for BLE integratation'
 
   s.description      = <<-DESC
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   
   s.swift_versions = '5'
     
-  s.dependency '2hire-K1', '0.1.0'
+  s.dependency '2hire-K1', s.version.to_s
 
   s.test_spec 'Tests' do |test_spec|
     test_spec.source_files = 'packages/sdk/ios/core/BLEIntSDK/Tests/**/*'

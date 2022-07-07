@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = '2hire-K1'
-  s.version          = '0.1.0'
+  s.version          = '0.0.2-beta.0'
   s.summary          = 'secp256k1 Elliptic Curve in Swift.'
 
   s.swift_version = '5'
@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '13.0'
 
-  s.dependency '2hire-secp256k1', '0.1.0'
+  s.dependency '2hire-secp256k1', s.version.to_s
   s.dependency 'BigInt', '~> 5.2'
 
   s.frameworks = 'CryptoKit'

@@ -10,6 +10,7 @@ Example for using Android:
 ```bash
     npm install
     ionic cordova prepare android
+    cordova plugin add ../../packages/cordova-plugin-bleintsdk --link
     ionic cordova run android --livereload --consolelogs
 ```
 
@@ -18,5 +19,6 @@ Example for using iOS:
 ```bash
     npm install
     ionic cordova prepare ios
+    cordova plugin add ../../packages/cordova-plugin-bleintsdk --link
     ionic cordova run ios --livereload --consolelogs
 ```
