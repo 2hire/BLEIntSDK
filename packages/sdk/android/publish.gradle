@@ -22,7 +22,7 @@ afterEvaluate {
             maven(MavenPublication) {
                 groupId = 'io.twohire'
                 artifactId = 'bleintsdk'
-                version = '0.0.2-beta.4'
+                version = '0.0.2-beta.5'
 
                 afterEvaluate {
                     from components.release
