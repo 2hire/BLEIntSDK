@@ -1,8 +1,15 @@
 
 
-### [0.0.2-beta.8](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.6...v0.0.2-beta.7) (2022-07-07)
+### [0.0.2-beta.9](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.7...v0.0.2-beta.8) (2022-07-07)
 
-### [0.0.2-beta.7](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.6...v0.0.2-beta.7) (2022-07-07)
+### [0.0.2-beta.8](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.7...v0.0.2-beta.8) (2022-07-07)
+
+### [0.0.2-beta.9](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.8...v0.0.2-beta.9) (2022-07-07)
+
+
+### Bug Fixes
+
+* **android:** jitpack package publication ([399a63b](https://github.com/2hire/BLEIntSDK-private/commit/399a63b0c3796b9b675fbf7e4efb25d15670fc63))
 
 ### [0.0.2-beta.8](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.7...v0.0.2-beta.8) (2022-07-07)
 

@@ -7,17 +7,6 @@ project.android.publishing {
 
 afterEvaluate {
     publishing {
-        repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/2hire/BLEIntSDK")
-                credentials {
-                    username = System.getenv("MAVEN_USERNAME")
-                    password = System.getenv("MAVEN_PASSWORD")
-                }
-            }
-        }
-
         publications {
             maven(MavenPublication) {
                 groupId = 'io.twohire'
