@@ -1,6 +1,10 @@
 
 
+### [0.0.2-beta.1](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.0...v0.0.2-beta.0) (2022-07-07)
+
 ### 0.0.2-beta.0 (2022-07-07)
+
+### [0.0.2-beta.1](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.0...v0.0.2-beta.1) (2022-07-07)
 
 ### 0.0.2-beta.0 (2022-07-07)
 

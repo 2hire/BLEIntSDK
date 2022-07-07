@@ -1,6 +1,6 @@
 {
   "name": "@2hire/bleintsdk-types",
-  "version": "0.0.2-beta.0",
+  "version": "0.0.2-beta.1",
   "main": "src/index.js",
   "license": "MIT",
   "types": "src/index.d.ts",
