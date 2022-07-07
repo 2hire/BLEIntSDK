@@ -16,5 +16,5 @@ Pod::Spec.new do |s|
   s.source_files = "ios/*.{h,m,mm,swift}"
 
   s.dependency "React-Core"
-  s.dependency "2hire-BLEIntSDK", "~> 0.0.2-beta.1"
+  s.dependency "2hire-BLEIntSDK", "~> 0.0.2-beta.2"
 end

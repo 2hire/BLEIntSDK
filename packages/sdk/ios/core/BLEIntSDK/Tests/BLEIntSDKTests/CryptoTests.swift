@@ -7,7 +7,7 @@
 import CryptoKit
 import XCTest
 
-@testable import BLEIntSDK
+@testable import _2hire_BLEIntSDK
 
 class CryptoTests: XCTestCase {
     private let externalPublicKey: [UInt8] = [

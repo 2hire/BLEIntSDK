@@ -1,8 +1,15 @@
 
 
-### [0.0.2-beta.1](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.0...v0.0.2-beta.0) (2022-07-07)
+### [0.0.2-beta.2](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.0...v0.0.2-beta.1) (2022-07-07)
 
-### 0.0.2-beta.0 (2022-07-07)
+### [0.0.2-beta.1](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.0...v0.0.2-beta.1) (2022-07-07)
+
+### [0.0.2-beta.2](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.1...v0.0.2-beta.2) (2022-07-07)
+
+
+### Bug Fixes
+
+* **ios:** framework import in tests ([cba707f](https://github.com/2hire/BLEIntSDK-private/commit/cba707f97f58631469a49f935902baecef94c256))
 
 ### [0.0.2-beta.1](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.0...v0.0.2-beta.1) (2022-07-07)
 
