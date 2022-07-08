@@ -5,7 +5,7 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
-import _2hire_secp256k1
+import secp256k1
 
 extension Bridge {
     

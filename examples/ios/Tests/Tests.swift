@@ -1,5 +1,5 @@
-import _2hire_BLEIntSDK
-import _2hire_K1
+import BLEIntSDK
+import K1
 import XCTest
 
 class Tests: XCTestCase {

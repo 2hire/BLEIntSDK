@@ -22,7 +22,6 @@ public enum CommandType: String, CaseIterable {
     case Start = "start"
     case Stop = "stop"
     case Noop = "noop"
-    case Locate = "locate"
     case EndSession = "end_session"
 }
 

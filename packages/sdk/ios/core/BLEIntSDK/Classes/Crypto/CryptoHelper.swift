@@ -5,7 +5,7 @@
 //
 
 import Foundation
-import _2hire_K1
+import K1
 
 internal class CryptoHelper {
     private init() {}

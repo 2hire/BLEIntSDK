@@ -5,7 +5,7 @@
 //
 
 import Foundation
-import _2hire_K1
+import K1
 
 public typealias PrivateKey = K1.PrivateKey
 public typealias PublicKey = K1.PublicKey

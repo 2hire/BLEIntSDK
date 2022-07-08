@@ -12,7 +12,6 @@ const commands: Commands = {
     'ADGU7JYtAr5KKbrF5yYvC8BywtDPJEbXn8jdelmxUUKU0Ajy5MlOnoZqIU96nnrGJzj/vZl61HCs683roIusJ/GQK3JJ8XEHKfj7DJBFR0Vl1cpTyOOTZihZUTwlpXn+Vf0zLLJFfR5RCAwSkQ3/meTSIah1e7PmZljmzDa8q6wbwXBSJLhOhZTfMX4O8NXCkZPRTCuxu+tmEbIwdu9dv6w=',
   // eslint-disable-next-line max-len
   stop: 'Ab644CTCZPheMLWoprChjMpr3J1hjY9E0vjIfyERlDhtyji3hNAlxInyTNpTY7Tgf3X7IDy0hLzq5hstPJ4ZkzqlMSWOkQf6n6mmY7Hqu52omjNokGfUPAs3fsXxJDhBOoJIkVWW5WbQ3YFWvhknwJMDd6o1qp+Zb2wKV+KvzdsuTpAhLv5cXZVP3gNnHQxfOVvyF0MwLw80EQU+I++ojMk=',
-  locate: '',
   // eslint-disable-next-line max-len
   noop: 'Apb9uzl903W403z9ZxO/tPaJ4otMtv93icRIh7IUhhowUH2+oMUGCxk/OoI7I5G6RCS+5lY/iPpfx1prdJdQYf57AVPNUjapbMVayMMkMyqzuJevGJBFmVUT1twoQpgRNasnDqvSwXbUCsoZ6fPQLz2v93rnXRqhbPzAJmLj1RZ8h5rwcDKOZpF0NTxdg4payvRHiaxurWHne2knNLYeoQU=',
   // eslint-disable-next-line @typescript-eslint/naming-convention

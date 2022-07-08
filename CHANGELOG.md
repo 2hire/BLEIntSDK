@@ -1,8 +1,27 @@
 
 
-### [0.0.2-beta.16](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.14...v0.0.2-beta.15) (2022-07-08)
+### [0.0.2-beta.17](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.15...v0.0.2-beta.16) (2022-07-08)
 
-### [0.0.2-beta.15](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.14...v0.0.2-beta.15) (2022-07-08)
+### [0.0.2-beta.16](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.15...v0.0.2-beta.16) (2022-07-08)
+
+### [0.0.2-beta.17](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.16...v0.0.2-beta.17) (2022-07-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ios:** rename K1 module name
+* **ios:** rename secp256k1 module name
+* **ios:** rename BLEIntSDK module name
+* remove `locate` command type
+
+### Features
+
+* remove `locate` command type ([0aeb594](https://github.com/2hire/BLEIntSDK-private/commit/0aeb59458b3f51cc9f9df5d0489703db94d8c2cf))
+
+
+* **ios:** rename BLEIntSDK module name ([72a053e](https://github.com/2hire/BLEIntSDK-private/commit/72a053e11f4150124524fa619d5161e9db4ce44c))
+* **ios:** rename K1 module name ([0d1a0ed](https://github.com/2hire/BLEIntSDK-private/commit/0d1a0ed506da1c3e91e9498b182f19773be3ab2c))
+* **ios:** rename secp256k1 module name ([d0e443f](https://github.com/2hire/BLEIntSDK-private/commit/d0e443fcf387f930183df36410d0827a35912a63))
 
 ### [0.0.2-beta.16](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.15...v0.0.2-beta.16) (2022-07-08)
 

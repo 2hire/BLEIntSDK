@@ -1,4 +1,4 @@
-import _2hire_BLEIntSDK
+import BLEIntSDK
 
 @objc(ReactNativeBleintSdk)
 class ReactNativeBleintSdk: NSObject {
@@ -18,7 +18,7 @@ class ReactNativeBleintSdk: NSObject {
                 with: SessionData(
                     accessToken: accessToken,
                     publicKey: publicKey,
-                    commands: _2hire_BLEIntSDK.Commands.fromDictionary(dictionary: commands)
+                    commands: BLEIntSDK.Commands.fromDictionary(dictionary: commands)
                 )
             )
 
@@ -86,7 +86,7 @@ class ReactNativeBleintSdk: NSObject {
     }
 }
 
-extension _2hire_BLEIntSDK.CommandResponse: Encodable {
+extension BLEIntSDK.CommandResponse: Encodable {
     private enum CodingKeys: String, CodingKey {
         case success = "success"
         case additionalPayload = "payload"
@@ -106,11 +106,11 @@ extension _2hire_BLEIntSDK.CommandResponse: Encodable {
     }
 }
 
-extension _2hire_BLEIntSDK.Commands {
+extension BLEIntSDK.Commands {
     fileprivate static func fromDictionary(dictionary: NSDictionary) -> Self {
         var result: Self = [:]
 
-        _2hire_BLEIntSDK.CommandType.allCases.forEach {
+        BLEIntSDK.CommandType.allCases.forEach {
             if let value = dictionary[$0.rawValue] as? String {
                 result[$0] = value
             }

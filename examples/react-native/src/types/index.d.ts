@@ -5,7 +5,6 @@ declare module '@env' {
   export const MOCK_BOARD_COMMAND_START: string;
   export const MOCK_BOARD_COMMAND_STOP: string;
   export const MOCK_BOARD_COMMAND_NOOP: string;
-  export const MOCK_BOARD_COMMAND_LOCATE: string;
   export const MOCK_BOARD_COMMAND_END_SESSION: string;
 
   export const TWOAA_CLIENT_ID: string;

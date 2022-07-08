@@ -2,7 +2,6 @@
 import * as SDK from '@2hire/react-native-bleintsdk';
 import {
   MOCK_BOARD_COMMAND_END_SESSION,
-  MOCK_BOARD_COMMAND_LOCATE,
   MOCK_BOARD_COMMAND_NOOP,
   MOCK_BOARD_COMMAND_START,
   MOCK_BOARD_COMMAND_STOP,
@@ -24,7 +23,6 @@ const Commands: SDK.Commands = {
   start: MOCK_BOARD_COMMAND_START,
   stop: MOCK_BOARD_COMMAND_STOP,
   noop: MOCK_BOARD_COMMAND_NOOP,
-  locate: MOCK_BOARD_COMMAND_LOCATE,
   end_session: MOCK_BOARD_COMMAND_END_SESSION,
 };
 
@@ -123,7 +121,6 @@ export default function App() {
                   start: '',
                   stop: '',
                   noop: '',
-                  locate: '',
                   end_session: '',
                   ...commands,
                 },

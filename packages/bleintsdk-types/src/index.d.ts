@@ -9,7 +9,7 @@ export interface BLEIntSdk {
   endSession: () => Promise<CommandResponse>;
 }
 
-export type CommandType = "start" | "stop" | "locate" | "noop" | "end_session";
+export type CommandType = "start" | "stop" | "noop" | "end_session";
 
 export type Commands = Record<CommandType, string>;
 
