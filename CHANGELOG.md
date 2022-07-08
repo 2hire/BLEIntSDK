@@ -1,8 +1,10 @@
 
 
-### [0.0.2-beta.15](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.13...v0.0.2-beta.14) (2022-07-08)
+### [0.0.2-beta.16](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.14...v0.0.2-beta.15) (2022-07-08)
 
-### [0.0.2-beta.14](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.13...v0.0.2-beta.14) (2022-07-07)
+### [0.0.2-beta.15](https://github.com/2hire/BLEIntSDK/compare/v0.0.2-beta.14...v0.0.2-beta.15) (2022-07-08)
+
+### [0.0.2-beta.16](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.15...v0.0.2-beta.16) (2022-07-08)
 
 ### [0.0.2-beta.15](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.2-beta.14...v0.0.2-beta.15) (2022-07-08)
 
