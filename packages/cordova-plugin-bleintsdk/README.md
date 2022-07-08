@@ -8,6 +8,20 @@ Cordova plugin for BLEIntSDK
 npm install @2hire/cordova-plugin-bleintsdk
 ```
 
+Add the plugin in package.json
+
+```jsonc
+{
+  "cordova": {
+    // ...
+    "plugins": {
+      // ...
+      "@2hire/cordova-plugin-bleintsdk": {},
+    }
+  }
+}
+```
+
 ## Usage
 
 ### Setup a new session

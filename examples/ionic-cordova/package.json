@@ -78,6 +78,7 @@
       "cordova-plugin-ionic-webview": {},
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-add-swift-support": {},
+      "@2hire/cordova-plugin-bleintsdk": {},
       "cordova-plugin-bleintsdk": {}
     },
     "platforms": [
