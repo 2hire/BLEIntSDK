@@ -4,18 +4,17 @@ echo "Creating .env.local"
 
 cat <<EOF >.env.local
 TWOAA_CLIENT_ID=$APP_TWOAA_CLIENT_ID
-TWOAA_ENV=$APP_TWOAA_ENV
 TWOAA_HOST=$APP_TWOAA_HOST
 TWOAA_SECRET=$APP_TWOAA_SECRET
 EOF
 
-if [[ -z "${APP_USE_MOCK}" ]]; then
-  echo "APP_USE_MOCK is not defined"
+if [[ -z "${APP_TEST_BOARD}" ]]; then
+  echo "APP_TEST_BOARD is not defined"
 else
   echo "Using mock data"
 
   cat <<EOF >.env.local
-USE_MOCK=$APP_USE_MOCK
+TEST_BOARD=$APP_TEST_BOARD
 EOF
 fi
 

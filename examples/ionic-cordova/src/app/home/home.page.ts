@@ -7,20 +7,13 @@ import { Component } from '@angular/core';
 import { AlertController, LoadingController } from '@ionic/angular';
 
 const commands: Commands = {
-  start:
-    // eslint-disable-next-line max-len
-    'ADGU7JYtAr5KKbrF5yYvC8BywtDPJEbXn8jdelmxUUKU0Ajy5MlOnoZqIU96nnrGJzj/vZl61HCs683roIusJ/GQK3JJ8XEHKfj7DJBFR0Vl1cpTyOOTZihZUTwlpXn+Vf0zLLJFfR5RCAwSkQ3/meTSIah1e7PmZljmzDa8q6wbwXBSJLhOhZTfMX4O8NXCkZPRTCuxu+tmEbIwdu9dv6w=',
-  // eslint-disable-next-line max-len
-  stop: 'Ab644CTCZPheMLWoprChjMpr3J1hjY9E0vjIfyERlDhtyji3hNAlxInyTNpTY7Tgf3X7IDy0hLzq5hstPJ4ZkzqlMSWOkQf6n6mmY7Hqu52omjNokGfUPAs3fsXxJDhBOoJIkVWW5WbQ3YFWvhknwJMDd6o1qp+Zb2wKV+KvzdsuTpAhLv5cXZVP3gNnHQxfOVvyF0MwLw80EQU+I++ojMk=',
-  // eslint-disable-next-line max-len
-  noop: 'Apb9uzl903W403z9ZxO/tPaJ4otMtv93icRIh7IUhhowUH2+oMUGCxk/OoI7I5G6RCS+5lY/iPpfx1prdJdQYf57AVPNUjapbMVayMMkMyqzuJevGJBFmVUT1twoQpgRNasnDqvSwXbUCsoZ6fPQLz2v93rnXRqhbPzAJmLj1RZ8h5rwcDKOZpF0NTxdg4payvRHiaxurWHne2knNLYeoQU=',
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  end_session:
-    // eslint-disable-next-line max-len
-    '/4sBEgY0S18Pj1Hdc2vPQypG5grjw3dGAq9iEgzsvhpc2Ze61E3iEXQNnjJBD4k5VU1U2mQUuKTdXt8rrdEhQ7XEOgmUVOGWzl8ppfgEYsogzhst+3JDjeTLJWZl0BE/t6FiKSW26iTHZDQfNJ3LDjNSIUgNDMoTsKSJlm2NsR8f/L5T+XyCIzkIr5tZOvCJaU2O7YOpwzz/w4inaGsmWIQ=',
+  start: 'start_command_payload',
+  stop: 'stop_command_payload',
+  noop: 'noop_command_payload',
+  end_session: 'end_session_command_payload',
 };
 
-const publicKey = 'Az8OqWnCYYyKCmuAJYrKUXDryu1HjpowPoRB8JkD5RRe';
+const publicKey = 'public_key';
 
 @Component({
   selector: 'app-home',
@@ -31,7 +24,7 @@ export class HomePage {
   accessToken = '';
   reports = Array<string>();
   sessionId: number | null = null;
-  identifier = 'C6F59B130C7C';
+  identifier = 'mac_address';
 
   constructor(
     public loadingController: LoadingController,

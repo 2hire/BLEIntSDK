@@ -1,5 +1,5 @@
 import * as SDK from '@2hire/bleintsdk-types';
-import {TWOAA_ENV, TWOAA_HOST} from '@env';
+import {TWOAA_HOST} from '@env';
 
 type ResponseBody<T> = {
   success: boolean;
@@ -23,7 +23,6 @@ export class TwoAAClient {
   static baseUrl = `https://${TWOAA_HOST}/api/v1`;
   static baseHeaders = {
     'Content-Type': 'application/json',
-    'ENV': TWOAA_ENV,
   };
 
   static access: {accessToken: string; expiration: Date} | null = null;

@@ -2,19 +2,37 @@
 
 This repository is the home of 2hire's BLEIntSDK and related libraries.
 
+## Documentation
+
+Extended documentation can be found [here](docs/README.md).
+
 ## Published Packages
 
-| Package                                                              | Version                                                                                                                               | License   |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| [@2hire/react-native-bleintsdk](packages/react-native-bleintsdk)     | [![version](https://badgen.net/npm/v/@2hire/react-native-bleintsdk)](https://www.npmjs.com/package/@2hire/react-native-bleintsdk)     | MIT       |
-| [@2hire/bleintsdk-types](packages/bleintsdk-types)                   | [![version](https://badgen.net/npm/v/@2hire/bleintsdk-types)](https://www.npmjs.com/package/@2hire/bleintsdk-types)                   | MIT       |
-| [@2hire/cordova-plugin-bleintsdk](packages/cordova-plugin-bleintsdk) | [![version](https://badgen.net/npm/v/@2hire/cordova-plugin-bleintsdk)](https://www.npmjs.com/package/@2hire/cordova-plugin-bleintsdk) | MIT       |
-| [2hire-BLEIntSDK](packages/sdk/ios/core)                             | [![version](https://badgen.net/cocoapods/v/2hire-BLEIntSDK)](https://cocoapods.org/pods/2hire-BLEIntSDK)                              | MIT       |
-| [2hire-K1](packages/sdk/ios/K1)                                      | [![version](https://badgen.net/cocoapods/v/2hire-K1)](https://cocoapods.org/pods/2hire-K1)                                            | MIT       |
-| [2hire-secp256k1](packages/sdk/ios/secp256k1)                        | [![version](https://badgen.net/cocoapods/v/2hire-secp256k1)](https://cocoapods.org/pods/2hire-secp256k1)                              | MIT       |
-| [BLEIntSDK-Android](packages/sdk/android)                            | [![version](https://jitpack.io/v/2hire/BLEIntSDK.svg)](https://jitpack.io/#2hire/BLEIntSDK)                                           | MIT       |
+### Native SDKs
+
+| Package                                   | Platform | Version                                                                                                  | License |
+| ----------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------- | ------- |
+| [2hire-BLEIntSDK](packages/sdk/ios/core)  | iOS      | [![version](https://badgen.net/cocoapods/v/2hire-BLEIntSDK)](https://cocoapods.org/pods/2hire-BLEIntSDK) | MIT     |
+| [BLEIntSDK-Android](packages/sdk/android) | Android  | [![version](https://jitpack.io/v/2hire/BLEIntSDK.svg)](https://jitpack.io/#2hire/BLEIntSDK)              | MIT     |
+
+#### Cross-platform bridges
+
+| Package                                                              | Version                                                                                                                               | License |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| [@2hire/react-native-bleintsdk](packages/react-native-bleintsdk)     | [![version](https://badgen.net/npm/v/@2hire/react-native-bleintsdk)](https://www.npmjs.com/package/@2hire/react-native-bleintsdk)     | MIT     |
+| [@2hire/cordova-plugin-bleintsdk](packages/cordova-plugin-bleintsdk) | [![version](https://badgen.net/npm/v/@2hire/cordova-plugin-bleintsdk)](https://www.npmjs.com/package/@2hire/cordova-plugin-bleintsdk) | MIT     |
+
+#### Utilities
+
+| Package                                            | Target     | Version                                                                                                             | License |
+| -------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------- | ------- |
+| [@2hire/bleintsdk-types](packages/bleintsdk-types) | Typescript | [![version](https://badgen.net/npm/v/@2hire/bleintsdk-types)](https://www.npmjs.com/package/@2hire/bleintsdk-types) | MIT     |
+| [2hire-K1](packages/sdk/ios/K1)                    | iOS        | [![version](https://badgen.net/cocoapods/v/2hire-K1)](https://cocoapods.org/pods/2hire-K1)                          | MIT     |
+| [2hire-secp256k1](packages/sdk/ios/secp256k1)      | iOS        | [![version](https://badgen.net/cocoapods/v/2hire-secp256k1)](https://cocoapods.org/pods/2hire-secp256k1)            | MIT     |
 
 ## Examples
+
+Example applications using the SDKs.
 
 - [SwiftUI](examples/ios/) Cocoapods, iOS only.
 - [ionic-cordova](examples/ionic-cordova/) with Angular 13, Android and iOS.

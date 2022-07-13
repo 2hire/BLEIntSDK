@@ -26,11 +26,20 @@ Add the plugin in package.json
 
 ### Setup a new session
 
+Before creating a session with a vehicle, a server session must be created using [`start_offline_session`](../../../../docs/endpoints.md#starting-a-offline-session) endpoint.
+
+Create a BLEIntSDK Client instance with data received from the endpoint.
+
 ```ts
 import type * as SDK from '@2hire/bleintsdk-types';
 
+const commandsHistory: string[] = [];
+
 // ...
 
+// data received from start_offline_session endpoint
+const accessDataToken = "session_roken";
+const publicKey = "board_public_key";
 const commands: SDK.Commands = {
   start: "start_command_payload",
   stop: "stop_command_payload",
@@ -38,33 +47,46 @@ const commands: SDK.Commands = {
   end_session: "end_session_command_payload",
 };
 
-const result = await cordova.plugins.BLEIntSDKCordova.sessionSetup("token", commands, "pubKey");
+const result = await cordova.plugins.BLEIntSDKCordova.sessionSetup(accessDataToken, commands, publicKey);
+
 console.log(result); // true
 ```
 
 ### Connect to a vehicle
 
-```ts
-// ...
+Connect to a board and start the session.
 
-const result = await cordova.plugins.BLEIntSDKCordova.connect("vehicle_identifier");
-console.log(result); // { success: true, payload: ... }
+```ts
+// board mac address is received from start_offline_session endpoint
+const boardMacAddress = "mac_address"
+
+// connect to vehicle using `boardMacAddress`
+const result = await cordova.plugins.BLEIntSDKCordova.connect(boardMacAddress);
+
+console.log(result); // { success: true, payload: "efab2331..." }
 ```
 
 ### Send a command to a vehicle
 
-```ts
-// ...
+Available commands are _Start_ and _Stop_.
 
+```ts
 const result = await cordova.plugins.BLEIntSDKCordova.sendCommand("start");
-console.log(result); // { success: true, payload: ... }
+
+// save base64 result.payload command response
+commandsHistory.push(result.payload)
+
+console.log(result); // { success: true, payload: "efab2331..." }
 ```
 
 ### End a session
 
-```ts
-// ...
+End the board session and clear the client instance. After ending a board session all payloads received must be then sent back to the server using [`end_offline_session`](../docs/endpoints.md#ending-a-offline-session).
 
+```ts
 const result = await cordova.plugins.BLEIntSDKCordova.endSession();
-console.log(result); // { success: true, payload: ... }
+
+console.log(result); // { success: true, payload: "efab2331..." }
+
+// endServerSession(commandsHistory)
 ```

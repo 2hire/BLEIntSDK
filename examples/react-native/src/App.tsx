@@ -1,15 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import * as SDK from '@2hire/react-native-bleintsdk';
 import {
-  MOCK_BOARD_COMMAND_END_SESSION,
-  MOCK_BOARD_COMMAND_NOOP,
-  MOCK_BOARD_COMMAND_START,
-  MOCK_BOARD_COMMAND_STOP,
-  MOCK_BOARD_IDENTIFIER,
-  MOCK_BOARD_PUBKEY,
+  TEST_BOARD_COMMAND_END_SESSION,
+  TEST_BOARD_COMMAND_NOOP,
+  TEST_BOARD_COMMAND_START,
+  TEST_BOARD_COMMAND_STOP,
+  TEST_BOARD_IDENTIFIER,
+  TEST_BOARD_PUBKEY,
   TWOAA_CLIENT_ID,
   TWOAA_SECRET,
-  USE_MOCK,
+  TEST_BOARD,
 } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as React from 'react';
@@ -20,10 +20,10 @@ import {Button} from './components/Button';
 import {TwoAAClient} from './utils/TwoAAHelper';
 
 const Commands: SDK.Commands = {
-  start: MOCK_BOARD_COMMAND_START,
-  stop: MOCK_BOARD_COMMAND_STOP,
-  noop: MOCK_BOARD_COMMAND_NOOP,
-  end_session: MOCK_BOARD_COMMAND_END_SESSION,
+  start: TEST_BOARD_COMMAND_START,
+  stop: TEST_BOARD_COMMAND_STOP,
+  noop: TEST_BOARD_COMMAND_NOOP,
+  end_session: TEST_BOARD_COMMAND_END_SESSION,
 };
 
 enum ActionType {
@@ -41,12 +41,12 @@ export default function App() {
   const [loadingAction, setLoadingAction] = useState<ActionType | null>(null);
   const [vehicleId, setVehicleId] = useState<string>('');
 
-  const identifier = useRef(MOCK_BOARD_IDENTIFIER);
+  const identifier = useRef(TEST_BOARD_IDENTIFIER);
   const sessionId = useRef<number | null>(null);
   const reports = useRef<string[]>([]);
 
   useEffect(() => {
-    if (!USE_MOCK) {
+    if (!TEST_BOARD) {
       AsyncStorage.getItem(StorageVehicleIdKey)
         .then((value) => {
           if (value != null) {
@@ -77,14 +77,14 @@ export default function App() {
 
   return (
     <Wrapper>
-      {USE_MOCK ? (
+      {TEST_BOARD ? (
         <MyTextInput value={accessDataToken} onChangeText={setAccessDataToken} />
       ) : (
         <MyTextInput placeholder="Vehicle ID" value={vehicleId} onChangeText={setVehicleId} />
       )}
       <MyButton
         color="#FF9500"
-        disabled={loadingAction !== null || (!USE_MOCK && vehicleId.length === 0)}
+        disabled={loadingAction !== null || (!TEST_BOARD && vehicleId.length === 0)}
         isLoading={loadingAction === ActionType.Create}
         title="Create"
         style={{marginBottom: 'auto'}}
@@ -96,8 +96,8 @@ export default function App() {
           setLoadingAction(ActionType.Create);
 
           try {
-            if (USE_MOCK) {
-              const response = await SDK.sessionSetup(accessDataToken, Commands, MOCK_BOARD_PUBKEY);
+            if (TEST_BOARD) {
+              const response = await SDK.sessionSetup(accessDataToken, Commands, TEST_BOARD_PUBKEY);
 
               console.log(response);
             } else {
@@ -158,7 +158,7 @@ export default function App() {
 
           await handleResponse(SDK.endSession());
 
-          if (!USE_MOCK && sessionId.current !== null) {
+          if (!TEST_BOARD && sessionId.current !== null) {
             try {
               const response = await TwoAAClient.endOfflineSession(vehicleId, sessionId.current, reports.current);
 

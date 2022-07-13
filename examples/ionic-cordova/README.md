@@ -1,7 +1,7 @@
 # Ionic Cordova example
 
 This is an example project using Ionic + Cordova with Angular 13.
-See [home.module.ts](src/app/home/home.module.ts) for the main functionality.
+See [home.page.ts](src/app/home/home.page.ts) for the main functionality.
 
 ## Installation
 
@@ -23,7 +23,7 @@ See [home.module.ts](src/app/home/home.module.ts) for the main functionality.
     ionic cordova run ios --livereload --consolelogs
 ```
 
-### Link local plugin
+## Development
 
 During development it may be useful to link the local plugin
 
