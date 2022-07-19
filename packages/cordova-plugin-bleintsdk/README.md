@@ -63,6 +63,9 @@ const boardMacAddress = "mac_address"
 // connect to vehicle using `boardMacAddress`
 const result = await cordova.plugins.BLEIntSDKCordova.connect(boardMacAddress);
 
+// save base64 result.payload command response
+commandsHistory.push(result.payload)
+
 console.log(result); // { success: true, payload: "efab2331..." }
 ```
 
@@ -85,6 +88,9 @@ End the board session and clear the client instance. After ending a board sessio
 
 ```ts
 const result = await cordova.plugins.BLEIntSDKCordova.endSession();
+
+// save base64 result.payload command response
+commandsHistory.push(result.payload)
 
 console.log(result); // { success: true, payload: "efab2331..." }
 
