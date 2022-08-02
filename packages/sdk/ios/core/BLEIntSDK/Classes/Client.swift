@@ -87,11 +87,11 @@ public class Client {
     }
 
     public func sendCommand(type: CommandType) async throws -> CommandResponse {
-        return try await self.sendCommand(type: type, shouldStartSession: false)
+        return try await self._sendCommand(type: type)
     }
 
     public func endSession() async throws -> CommandResponse {
-        let data = try await self.sendCommand(type: .EndSession, shouldStartSession: false)
+        let data = try await self._sendCommand(type: .EndSession)
 
         self.personalPrivateKey = nil
         self.sessionData = nil
@@ -101,7 +101,7 @@ public class Client {
         return data
     }
 
-    private func sendCommand(type: CommandType, shouldStartSession: Bool) async throws
+    private func _sendCommand(type: CommandType) async throws
         -> CommandResponse
     {
         guard let manager = self.manager, let sessionData = self.sessionData,
