@@ -6,6 +6,7 @@
 
 import Foundation
 import K1
+import Logging
 import os.log
 
 public struct ProtocolResponse {
@@ -13,7 +14,7 @@ public struct ProtocolResponse {
     public let additionalPayload: [UInt8]
 
     internal var description: String {
-        "Command was \(self.success ? "successful" : "unsuccessful") with additionalPayload \(self.additionalPayload.description)"
+        "Command was \(self.success ? "successful" : "unsuccessful") with additionalPayload \(Data(self.additionalPayload).base64EncodedString())"
     }
 }
 
@@ -22,7 +23,15 @@ internal class ProtocolManager {
     private var publicKey: PublicKey!
 
     private var writable: WritableTL!
-    private(set) var writableState: WritableTLState?
+    private(set) var writableState: WritableTLState? {
+        didSet {
+            if let state = self.writableState {
+                self.delegate?.state(didChange: state)
+            }
+        }
+    }
+
+    private var delegate: ProtocolManagerDelegate?
 
     private var writeBuffer: [[UInt8]] = []
     private var readBuffer: [UInt8] = []
@@ -30,13 +39,22 @@ internal class ProtocolManager {
     private var writeContinuation: CheckedContinuation<ProtocolResponse, Error>?
     private var connectionContinuation: CheckedContinuation<Void, Error>?
 
-    init(with writable: WritableTL, privateKey: PrivateKey, publicKey: PublicKey) {
+    private static let logger = LoggingUtil.logger
+
+    init(
+        with writable: WritableTL,
+        privateKey: PrivateKey,
+        publicKey: PublicKey,
+        delegate: ProtocolManagerDelegate
+    ) {
         self.privateKey = privateKey
         self.publicKey = publicKey
 
         self.writable = writable
         self.writable.writableDelegate = self
         self.writable.connectableDelegate = self
+
+        self.delegate = delegate
     }
 
     func setPrivateKey(_ key: PrivateKey) {
@@ -75,11 +93,10 @@ internal class ProtocolManager {
                     ProtocolConstant.StartSequence, personalPublicKey + data, ProtocolConstant.EndSequence,
                 ]
 
-                os_log(
-                    "Start session data %{private}@",
-                    log: .protocol,
-                    type: .default,
-                    writeBuffer.description
+                Self.logger.debug(
+                    "Start session data \(writeBuffer.description)",
+                    metadata: .protocol
+
                 )
                 try self.write()
             }
@@ -109,11 +126,10 @@ internal class ProtocolManager {
                     ProtocolConstant.StartSequence, commandPayload, ProtocolConstant.EndSequence,
                 ]
 
-                os_log(
-                    "Sending command data: %{private}@",
-                    log: .protocol,
-                    type: .default,
-                    writeBuffer.description
+                Self.logger.info(
+                    "Sending command data: \(writeBuffer.description)",
+                    metadata: .protocol
+
                 )
                 try self.write()
             }
@@ -155,11 +171,9 @@ internal class ProtocolManager {
             return [UInt8](dataToWrite)
         }
         catch {
-            os_log(
-                "Error while encrypting command data: %@",
-                log: .protocol,
-                type: .error,
-                error.localizedDescription
+            Self.logger.error(
+                "Error while encrypting command data: \(error.localizedDescription)",
+                metadata: .protocol
             )
             throw ProtocolError.Crypto
         }
@@ -176,14 +190,12 @@ internal class ProtocolManager {
             let encryptedPayload = [UInt8](data[33...])
 
             #if DEBUG
-                os_log("Buffer length %{private}d", log: .protocol, type: .default, data.count)
-                os_log("Nonce: %{private}@", log: .protocol, type: .default, Data(nonce).hexEncodedString)
-                os_log("Tag: %{private}@", log: .protocol, type: .default, Data(tag).hexEncodedString)
-                os_log(
-                    "Private key: %{private}@",
-                    log: .protocol,
-                    type: .default,
-                    Data(privateKey.rawRepresentation()).hexEncodedString
+                Self.logger.debug("Buffer length \(data.count)", metadata: .protocol)
+                Self.logger.debug("Nonce: \(Data(nonce).hexEncodedString)", metadata: .protocol)
+                Self.logger.debug("Tag: \(Data(tag).hexEncodedString)", metadata: .protocol)
+                Self.logger.debug(
+                    "Private key: \(Data(privateKey.rawRepresentation()).hexEncodedString)",
+                    metadata: .protocol
                 )
             #endif
 
@@ -198,10 +210,10 @@ internal class ProtocolManager {
             )
         }
         catch let err as CryptoKitError {
-            os_log("CryptoKit error %@", log: .protocol, type: .error, err.description)
+            Self.logger.error("CryptoKit error \(err.description)", metadata: .protocol)
         }
         catch {
-            os_log("Error while decrypting data %@", log: .protocol, type: .error)
+            Self.logger.error("Error while decrypting data", metadata: .protocol)
         }
 
         throw ProtocolError.Crypto
@@ -232,13 +244,13 @@ internal class ProtocolManager {
 extension ProtocolManager: WritableTLDelegate {
     private func write() throws {
         guard let nextChunk = self.writeBuffer.first else {
-            os_log("Chunk is empty, starting read", log: .protocol, type: .default)
+            Self.logger.info("Chunk is empty, starting read", metadata: .protocol)
 
             do {
                 try self.writable.startReading()
             }
             catch {
-                os_log("Error while writing", log: .protocol, type: .error)
+                Self.logger.error("Error while writing", metadata: .protocol)
 
                 self.writeContinuation?.resume(throwing: error)
                 self.writeContinuation = nil
@@ -247,11 +259,10 @@ extension ProtocolManager: WritableTLDelegate {
         }
 
         guard self.writableState == .Connected else {
-            os_log(
-                "Writable is not in connected state: %@",
-                log: .protocol,
-                type: .default,
-                (self.writableState ?? .Reading).description
+            Self.logger.info(
+                "Writable is not in connected state: \((self.writableState ?? .Reading).description)",
+                metadata: .protocol
+
             )
 
             self.writeContinuation?.resume(throwing: ProtocolError.Writable)
@@ -260,12 +271,18 @@ extension ProtocolManager: WritableTLDelegate {
             return
         }
 
+        #if DEBUG
+            Self.logger.debug("Writing data \(writeBuffer.description)", metadata: .protocol)
+        #else
+            Self.logger.info("Writing data", metadata: .protocol)
+        #endif
+
         try self.writable.write(data: nextChunk)
     }
 
     func writable(didWrite remainingData: [UInt8], _ error: Error?) {
         if let error = error {
-            os_log("Error while writing %@", log: .protocol, type: .error, error.localizedDescription)
+            Self.logger.error("Error while writing \(error.localizedDescription)", metadata: .protocol)
 
             self.writeContinuation?.resume(throwing: error)
             self.writeContinuation = nil
@@ -274,11 +291,9 @@ extension ProtocolManager: WritableTLDelegate {
         }
 
         guard remainingData.isEmpty else {
-            os_log(
-                "Error while writing, data is not empty: %@",
-                log: .protocol,
-                type: .error,
-                remainingData.description
+            Self.logger.error(
+                "Error while writing, data is not empty: \(remainingData.description)",
+                metadata: .protocol
             )
 
             self.writeContinuation?.resume(throwing: ProtocolError.Generic)
@@ -293,7 +308,7 @@ extension ProtocolManager: WritableTLDelegate {
             try self.write()
         }
         catch {
-            os_log("Error while writing", log: .protocol, type: .error, remainingData.description)
+            Self.logger.error("Error while writing \(remainingData.description)", metadata: .protocol)
 
             self.writeContinuation?.resume(throwing: error)
             self.writeContinuation = nil
@@ -302,7 +317,7 @@ extension ProtocolManager: WritableTLDelegate {
 
     func writable(didReceive data: [UInt8]?, _ error: Error?) {
         guard let receivedData = data, error == nil else {
-            os_log("Error while reading %@", log: .protocol, type: .error, error.debugDescription)
+            Self.logger.error("Error while reading \(error.debugDescription))", metadata: .protocol)
 
             self.writeContinuation?.resume(throwing: error ?? ProtocolError.Generic)
             self.writeContinuation = nil
@@ -310,36 +325,33 @@ extension ProtocolManager: WritableTLDelegate {
             return
         }
 
-        os_log("Did receive %@", log: .protocol, type: .default, receivedData.description)
+        Self.logger.debug("Did receive \(receivedData.description))", metadata: .protocol)
 
         switch receivedData {
         case ProtocolConstant.StartSequence:
             self.readBuffer = []
-            os_log(
-                "Read start sequence: %@, skipping",
-                log: .protocol,
-                type: .default,
-                receivedData.description
+            Self.logger.debug(
+                "Read start sequence: \(receivedData.description), skipping",
+                metadata: .protocol
+
             )
 
             break
         case ProtocolConstant.EndSequence:
-            os_log(
-                "Read end sequence: %@, closing",
-                log: .protocol,
-                type: .default,
-                receivedData.description
+            Self.logger.debug(
+                "Read end sequence: \(receivedData.description), closing",
+                metadata: .protocol
+
             )
 
             do {
                 try self.writable.stopReading()
             }
             catch {
-                os_log(
-                    "Error while stop reading %@",
-                    log: .protocol,
-                    type: .error,
-                    error.localizedDescription
+                Self.logger.error(
+                    "Error while stop reading \(error.localizedDescription)",
+                    metadata: .protocol
+
                 )
                 self.writeContinuation?.resume(throwing: error)
                 self.writeContinuation = nil
@@ -360,11 +372,9 @@ extension ProtocolManager: WritableTLDelegate {
             )
 
             if let decryptedDataValue = decryptedData {
-                os_log(
-                    "Decrypted data %{private}@",
-                    log: .protocol,
-                    type: .default,
-                    Data(decryptedDataValue).hexEncodedString
+                Self.logger.info(
+                    "Decrypted data \(Data(decryptedDataValue).hexEncodedString)",
+                    metadata: .protocol
                 )
 
                 self.processCommandResponse(payload: decryptedDataValue)
@@ -374,11 +384,9 @@ extension ProtocolManager: WritableTLDelegate {
             }
         }
         catch {
-            os_log(
-                "Error while stop reading %@",
-                log: .protocol,
-                type: .error,
-                error.localizedDescription
+            Self.logger.error(
+                "Error while stop reading \(error.localizedDescription)",
+                metadata: .protocol
             )
             self.writeContinuation?.resume(throwing: error)
             self.writeContinuation = nil
@@ -386,12 +394,9 @@ extension ProtocolManager: WritableTLDelegate {
     }
 
     func connection(didChangeState state: WritableTLState) {
-        os_log(
-            "Did change status: %@ -> %@",
-            log: .protocol,
-            type: .default,
-            self.writableState?.description ?? "nil",
-            state.description
+        Self.logger.info(
+            "Did change status: \(self.writableState?.description ?? "nil") -> \(state.description)",
+            metadata: .protocol
         )
         self.writableState = state
     }
@@ -400,11 +405,9 @@ extension ProtocolManager: WritableTLDelegate {
 extension ProtocolManager: ConnectableTLDelegate {
     func create(didCreate data: Any?, _ error: Error?) {
         guard error == nil else {
-            os_log(
-                "Creation Error %@",
-                log: .protocol,
-                type: .error,
-                error?.localizedDescription ?? "Error not set"
+            Self.logger.error(
+                "Creation Error \(error?.localizedDescription ?? "Error not set")",
+                metadata: .protocol
             )
 
             self.connectionContinuation?.resume(throwing: ProtocolError.Writable)
@@ -413,33 +416,37 @@ extension ProtocolManager: ConnectableTLDelegate {
             return
         }
 
-        os_log("Writable created", log: .protocol, type: .error)
+        Self.logger.info("Writable created", metadata: .protocol)
     }
 
     func connect(didConnect data: Any?, _ error: Error?) {
         guard error == nil else {
-            os_log(
-                "Connection Error %@",
-                log: .protocol,
-                type: .error,
-                error?.localizedDescription ?? "Error not set"
+            Self.logger.error(
+                "Connection Error \(error?.localizedDescription ?? "Error not set")",
+                metadata: .protocol
             )
 
-            self.connectionContinuation?.resume(throwing: ProtocolError.Writable)
+            self.connectionContinuation?.resume(throwing: error ?? ProtocolError.Writable)
             self.connectionContinuation = nil
 
             return
         }
 
-        os_log("Writable connected", log: .protocol, type: .error)
+        Self.logger.info("Writable connected", metadata: .protocol)
 
         self.connectionContinuation?.resume()
         self.connectionContinuation = nil
     }
 }
 
-extension OSLog {
-    private static var subsystem = Bundle.main.bundleIdentifier ?? "BundleIdentifier not set"
+extension Logging.Logger.Metadata {
+    fileprivate static var `protocol`: Self {
+        var metadata: Self = ["category": "🔀 ProtocolManager"]
 
-    fileprivate static let `protocol` = OSLog(subsystem: subsystem, category: "🔀 ProtocolManager")
+        if let requestId = Self.requestId {
+            metadata["requestId"] = "\(requestId)"
+        }
+
+        return metadata
+    }
 }

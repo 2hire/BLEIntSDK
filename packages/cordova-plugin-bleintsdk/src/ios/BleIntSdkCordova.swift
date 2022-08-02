@@ -9,8 +9,8 @@ class BLEIntSDKCordova: CDVPlugin {
     func sessionSetup(command: CDVInvokedUrlCommand) {
         do {
             guard let accessToken = command.argument(at: 0) as? String,
-                let commands = command.argument(at: 1) as? NSDictionary,
-                let publicKey = command.argument(at: 2) as? String
+                  let commands = command.argument(at: 1) as? NSDictionary,
+                  let publicKey = command.argument(at: 2) as? String
             else {
                 throw BridgeError.InvalidArgument
             }
@@ -27,6 +27,19 @@ class BLEIntSDKCordova: CDVPlugin {
                 CDVPluginResult(
                     status: CDVCommandStatus_OK,
                     messageAs: true
+                ),
+                callbackId: command.callbackId
+            )
+        }
+        catch let error as BLEIntSDKError {
+            self.commandDelegate.send(
+                CDVPluginResult(
+                    status: CDVCommandStatus_ERROR,
+                    messageAs: [
+                        "code": error.rawValue,
+                        "message":
+                            "Something went wrong while creating (\(error.errorDescription ?? error.localizedDescription))",
+                    ]
                 ),
                 callbackId: command.callbackId
             )
@@ -61,6 +74,19 @@ class BLEIntSDKCordova: CDVPlugin {
                     callbackId: command.callbackId
                 )
             }
+            catch let error as BLEIntSDKError {
+                self.commandDelegate.send(
+                    CDVPluginResult(
+                        status: CDVCommandStatus_ERROR,
+                        messageAs: [
+                            "code": error.rawValue,
+                            "message":
+                                "Something went wrong while connecting to vehicle (\(error.errorDescription ?? error.localizedDescription))",
+                        ]
+                    ),
+                    callbackId: command.callbackId
+                )
+            }
             catch {
                 self.commandDelegate.send(
                     CDVPluginResult(
@@ -78,7 +104,7 @@ class BLEIntSDKCordova: CDVPlugin {
         Task.init {
             do {
                 guard let _command = command.argument(at: 0) as? String,
-                    let commandType = BLEIntSDK.CommandType(rawValue: _command)
+                      let commandType = BLEIntSDK.CommandType(rawValue: _command)
                 else {
                     throw BridgeError.InvalidArgument
                 }
@@ -89,6 +115,19 @@ class BLEIntSDKCordova: CDVPlugin {
                     CDVPluginResult(
                         status: CDVCommandStatus_OK,
                         messageAs: response.asDictionary
+                    ),
+                    callbackId: command.callbackId
+                )
+            }
+            catch let error as BLEIntSDKError {
+                self.commandDelegate.send(
+                    CDVPluginResult(
+                        status: CDVCommandStatus_ERROR,
+                        messageAs: [
+                            "code": error.rawValue,
+                            "message":
+                                "Something went wrong while sending command to vehicle (\(error.errorDescription ?? error.localizedDescription))",
+                        ]
                     ),
                     callbackId: command.callbackId
                 )
@@ -116,6 +155,19 @@ class BLEIntSDKCordova: CDVPlugin {
                     CDVPluginResult(
                         status: CDVCommandStatus_OK,
                         messageAs: response.asDictionary
+                    ),
+                    callbackId: command.callbackId
+                )
+            }
+            catch let error as BLEIntSDKError {
+                self.commandDelegate.send(
+                    CDVPluginResult(
+                        status: CDVCommandStatus_ERROR,
+                        messageAs: [
+                            "code": error.rawValue,
+                            "message":
+                                "Something went wrong while ending session (\(error.errorDescription ?? error.localizedDescription))",
+                        ]
                     ),
                     callbackId: command.callbackId
                 )

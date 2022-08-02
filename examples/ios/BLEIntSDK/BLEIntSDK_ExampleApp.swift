@@ -10,6 +10,7 @@ import SwiftUI
 
 @main
 struct BLEIntSDK_ExampleApp: App {
+
     var body: some Scene {
         WindowGroup {
             ContentView()

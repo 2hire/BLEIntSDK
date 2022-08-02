@@ -18,8 +18,9 @@ import kotlin.coroutines.suspendCoroutine
 
 internal class ProtocolManager private constructor(
     private var keyPair: ECKeyPair,
-    private val publicKey: ECPublicKey
-) {
+    private val publicKey: ECPublicKey,
+    private val delegate: ProtocolManagerDelegate
+): ProtocolManagerDelegate by delegate {
     private val tag = "${ProtocolManager::class.simpleName}@${System.identityHashCode(this)}"
 
     private var bluetoothLeService: BluetoothLeService? = null
@@ -64,6 +65,7 @@ internal class ProtocolManager private constructor(
                                 "Did change state: ${this@ProtocolManager.writableState?.name} -> ${state.name}"
                             )
                             this@ProtocolManager.writableState = state
+                            this@ProtocolManager.delegate.didChangeState(state)
                         }
                     }
                 }
@@ -185,8 +187,9 @@ internal class ProtocolManager private constructor(
     private constructor(
         context: Context,
         keyPair: ECKeyPair,
-        publicKey: ECPublicKey
-    ) : this(keyPair, publicKey) {
+        publicKey: ECPublicKey,
+        callback: ProtocolManagerDelegate
+    ) : this(keyPair, publicKey, callback) {
 
         val connection = BluetoothLeServiceConnection()
         val status =
@@ -362,10 +365,11 @@ internal class ProtocolManager private constructor(
         fun getInstance(
             context: Context,
             keyPair: ECKeyPair,
-            publicKey: ECPublicKey
+            publicKey: ECPublicKey,
+            callback: ProtocolManagerDelegate
         ): ProtocolManager {
             if (this.instance == null) {
-                this.instance = ProtocolManager(context, keyPair, publicKey)
+                this.instance = ProtocolManager(context, keyPair, publicKey, callback)
             }
 
             return this.instance!!
@@ -428,4 +432,8 @@ internal class ProtocolManager private constructor(
                 )
             }
     }
+}
+
+internal interface ProtocolManagerDelegate {
+    fun didChangeState(state: WritableTLState)
 }

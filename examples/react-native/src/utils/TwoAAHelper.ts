@@ -10,7 +10,7 @@ type ResponseError = {code: string; details: {cause: string}};
 
 type Response<T> = ResponseBody<T> | ResponseError;
 
-type StartOfflineSessionResponse = {
+export type StartOfflineSessionResponse = {
   version: number;
   sessionId: number;
   accessDataToken: string;
@@ -55,7 +55,10 @@ export class TwoAAClient {
     return this.access;
   }
 
-  static async startOfflineSession(uuid: string): Promise<ResponseBody<StartOfflineSessionResponse>> {
+  static async startOfflineSession(
+    uuid: string,
+    expireTimestamp: number,
+  ): Promise<ResponseBody<StartOfflineSessionResponse>> {
     if (!this.isValid) {
       throw 'auth not set';
     }
@@ -67,7 +70,7 @@ export class TwoAAClient {
         Authorization: `Bearer ${this.access?.accessToken}`,
       },
       body: JSON.stringify({
-        timestamp: (Date.now() + 60 * 60 * 24) / 1000,
+        timestamp: expireTimestamp,
         allowedCommands: ['start', 'stop'],
       }),
     });

@@ -7,6 +7,7 @@
 //
 
 import BLEIntSDK
+import Logging
 import SwiftUI
 import os.log
 
@@ -39,7 +40,8 @@ struct ContentView: View {
                         let commands: BLEIntSDK.Commands = [
                             .Start:
                                 "ADqK3S1Ls8tu2NRha3/BKhdQOu3qCZgRXY1q/tDIKjzQhhcC3XqPlAXvN+Ct58ih8R2jKqkEZyldkKM0yvphMWgL4aLjE7rLnL+sKpTTofT+iriD+Ab3uhqrdVkSlHsfLGMfqAYvPvOHVhz8LoLoHK58EPsh/4PejhKBTpXPhbFpbO5dBllwdQJco9dSg4E38EDexbOmn5rcndwNWGLrGAY=",
-                            .Stop: "AeUnVRMt7CF6dF6Ee3j3xDr+/MFVnZKN1L94oPVSiWHiSdV5/0TodK4zV3CkE9h67jQ8P4yym9vXqD6WoFt9flyxGWswV95d0RYX96w8W6UnCu3FLdWwgQYwAVCwmTU1Gqj3rXjzJs1fNgic0thn1cFqLtgNQefGm42zzivS48PBD2Mdk3LyFzzqJVw+HMCPG4x+sbkor8UcKhuI+0043Ig=",
+                            .Stop:
+                                "AeUnVRMt7CF6dF6Ee3j3xDr+/MFVnZKN1L94oPVSiWHiSdV5/0TodK4zV3CkE9h67jQ8P4yym9vXqD6WoFt9flyxGWswV95d0RYX96w8W6UnCu3FLdWwgQYwAVCwmTU1Gqj3rXjzJs1fNgic0thn1cFqLtgNQefGm42zzivS48PBD2Mdk3LyFzzqJVw+HMCPG4x+sbkor8UcKhuI+0043Ig=",
                             .Noop:
                                 "AlbBTYOrZb2IO1kJd8uEnRgDsQE38yj6mRAiuQmrgW4wUOu0FPHKxZ3oN95tzf3zpKE1x2YcSqOavIdd3FvDwtm+GF9ISZ+/wHdwbfO4N0ODFJ7zgU9XVj+tflfyMYiLkbRQoeZMs4TR5eyIQ51o8FQoXKtdsesn8COZd6dtNPkcUL2+T6UdKyUHb9hLIs4U8ne7C3GmScsZiAzWlRKS3x4=",
                             .EndSession:
@@ -47,6 +49,7 @@ struct ContentView: View {
                         ]
 
                         let client = Client.init()
+
                         self.client = client
                         try client.sessionSetup(
                             with: SessionData(accessToken: accessDataTokenString, publicKey: key, commands: commands)

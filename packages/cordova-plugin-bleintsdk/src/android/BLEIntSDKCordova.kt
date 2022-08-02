@@ -1,8 +1,9 @@
-package io.twohire.cordova.bleintsdk;
+package io.twohire.cordova.bleintsdk
 
 import android.content.Context
 import android.util.Base64
 import io.twohire.bleintsdk.client.*
+import io.twohire.bleintsdk.utils.BLEIntSDKException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -69,7 +70,7 @@ class BLEIntSDKCordova : CordovaPlugin() {
                     this.context,
                     SessionConfig(
                         accessToken, publicKey,
-                        buildCommands(commands)!!
+                        buildCommands(commands)
                     )
                 )
 
@@ -77,6 +78,9 @@ class BLEIntSDKCordova : CordovaPlugin() {
                     PluginResult(PluginResult.Status.OK, true)
                 )
             }
+        } catch (e: BLEIntSDKException) {
+            e.printStackTrace()
+            callbackContext.error(e.toJSONObject { "Something went wrong while creating ($it)" })
         } catch (e: Exception) {
             e.printStackTrace()
             callbackContext.error("Something went wrong while creating (${e.message})")
@@ -96,6 +100,9 @@ class BLEIntSDKCordova : CordovaPlugin() {
                         )
                     )
                 }
+            } catch (e: BLEIntSDKException) {
+                e.printStackTrace()
+                callbackContext.error(e.toJSONObject { "Something went wrong while connecting to vehicle ($it)" })
             } catch (e: Exception) {
                 e.printStackTrace()
                 callbackContext.error("Something went wrong while connecting to vehicle (${e.message})")
@@ -120,6 +127,9 @@ class BLEIntSDKCordova : CordovaPlugin() {
                 } else {
                     callbackContext.error("Command not found")
                 }
+            } catch (e: BLEIntSDKException) {
+                e.printStackTrace()
+                callbackContext.error(e.toJSONObject { "Something went wrong while sending command to vehicle ($it)" })
             } catch (error: Exception) {
                 error.printStackTrace()
 
@@ -140,6 +150,9 @@ class BLEIntSDKCordova : CordovaPlugin() {
                         )
                     )
                 }
+            } catch (e: BLEIntSDKException) {
+                e.printStackTrace()
+                callbackContext.error(e.toJSONObject { "Something went wrong while ending session ($it)" })
             } catch (error: Exception) {
                 error.printStackTrace()
                 callbackContext.error("Something went wrong while ending session")
@@ -152,7 +165,7 @@ internal fun buildCommands(map: JSONObject): Commands {
 
     CommandType.values().forEach {
         if (map.has(it.rawValue)) {
-            map.getString(it.rawValue)?.let { value ->
+            map.getString(it.rawValue).let { value ->
                 commands[it] = value
             }
         }
@@ -165,3 +178,6 @@ internal fun CommandResponse.toJSONObject(): JSONObject =
     JSONObject()
         .put("success", this.success)
         .put("payload", Base64.encodeToString(this.additionalPayload, Base64.DEFAULT))
+
+internal fun BLEIntSDKException.toJSONObject(getMessage: (m: String) -> String): JSONObject =
+    JSONObject().put("code", this.error.code).put("message", getMessage(this.error.description))

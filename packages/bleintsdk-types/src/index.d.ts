@@ -17,3 +17,12 @@ export type CommandResponse = {
   success: boolean;
   payload: string;
 } | null;
+
+export type ErrorCode =
+  | "invalid_data"
+  | "invalid_state"
+  | "invalid_session"
+  | "not_connected"
+  | "timeout"
+  | "peripheral_not_found"
+  | "internal";

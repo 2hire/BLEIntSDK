@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import Logging
 import os.log
 
 internal var BundleIdentifier =
@@ -16,6 +17,8 @@ private struct KeychainResult {
 }
 
 internal class KeychainHelper {
+
+    private static let logger = LoggingUtil.logger
 
     private static var bundleIdentifier: String {
         get throws {
@@ -41,7 +44,7 @@ internal class KeychainHelper {
                 kSecValueData: valueData,
             ] as CFDictionary
 
-        os_log("Saving PrivateKey in keychain", log: .keychain, type: .debug)
+        Self.logger.info("Saving PrivateKey in keychain", metadata: .keychain)
         let saveStatus = SecItemAdd(saveQuery, nil)
 
         if saveStatus == errSecDuplicateItem {
@@ -54,15 +57,13 @@ internal class KeychainHelper {
 
             let attributeToUpdate = [kSecValueData: valueData] as CFDictionary
 
-            os_log("PrivateKey already in keychain, updating", log: .keychain, type: .debug)
+            Self.logger.info("PrivateKey already in keychain, updating", metadata: .keychain)
             let updateStatus = SecItemUpdate(updateQuery, attributeToUpdate)
 
             guard updateStatus == errSecSuccess else {
-                os_log(
+                Self.logger.info(
                     "Error while updating PrivateKey in keychain already",
-                    log: .keychain,
-                    type: .debug,
-                    updateStatus.description
+                    metadata: .keychain
                 )
                 throw KeyChainHelperError.GenericError
             }
@@ -95,7 +96,7 @@ internal class KeychainHelper {
 
         guard status == errSecSuccess else {
             if status == errSecItemNotFound {
-                os_log("PrivateKey not found in keychain", log: .keychain, type: .debug)
+                Self.logger.info("PrivateKey not found in keychain", metadata: .keychain)
                 throw KeyChainHelperError.PrivateKeyNotFoundError
             }
 
@@ -107,7 +108,7 @@ internal class KeychainHelper {
         let privateKeyData = keychainData[size...]
 
         let privateKey = try CryptoHelper.wrapPrivateKey(from: [UInt8](privateKeyData))
-        os_log("PrivateKey found in keychain", log: .keychain, type: .debug)
+        Self.logger.info("PrivateKey found in keychain", metadata: .keychain)
 
         return .init(
             privateKey: privateKey,
@@ -129,11 +130,11 @@ internal class KeychainHelper {
             throw KeyChainHelperError.GenericError
         }
 
-        os_log("PrivateKey deleted from keychain", log: .keychain, type: .debug)
+        Self.logger.info("PrivateKey deleted from keychain", metadata: .keychain)
     }
 
     static func generateAndSavePrivateKey() throws -> PrivateKey {
-        os_log("Generating PrivateKey", log: .keychain, type: .debug)
+        Self.logger.info("Generating PrivateKey", metadata: .keychain)
 
         let key = try CryptoHelper.generatePrivateKey()
         let result = KeychainResult.init(privateKey: key, timestamp: Date().timeIntervalSince1970)
@@ -150,22 +151,18 @@ internal class KeychainHelper {
             if let keyAge = maxAge {
                 let now = Date()
 
-                os_log(
-                    "Key was created at %@ (now: %@) with maxAge of %@",
-                    log: .keychain,
-                    type: .debug,
-                    Date(timeIntervalSince1970: result.timestamp).description,
-                    now.description,
-                    keyAge.description
+                Self.logger.debug(
+                    "Key was created at \(Date(timeIntervalSince1970: result.timestamp).description) (now: \(now.description)) with maxAge of \(keyAge.description)",
+                    metadata: .keychain
                 )
 
                 if result.timestamp + keyAge < now.timeIntervalSince1970 {
-                    os_log("Key has expired, generating a new one", log: .keychain, type: .debug)
+                    Self.logger.info("Key has expired, generating a new one", metadata: .keychain)
 
                     return try Self.generateAndSavePrivateKey()
                 }
                 else {
-                    os_log("Key is still valid", log: .keychain, type: .debug)
+                    Self.logger.info("Key is still valid", metadata: .keychain)
                 }
             }
 
@@ -183,8 +180,14 @@ internal enum KeyChainHelperError: Error {
     case GenericError
 }
 
-extension OSLog {
-    private static var subsystem = Bundle.main.bundleIdentifier ?? "BundleIdentifier not set"
+extension Logging.Logger.Metadata {
+    fileprivate static var keychain: Self {
+        var metadata: Self = ["category": "🔐 KeychainHelper"]
 
-    fileprivate static let keychain = OSLog(subsystem: subsystem, category: "🔐 KeychainHelper")
+        if let requestId = Self.requestId {
+            metadata["requestId"] = "\(requestId)"
+        }
+
+        return metadata
+    }
 }

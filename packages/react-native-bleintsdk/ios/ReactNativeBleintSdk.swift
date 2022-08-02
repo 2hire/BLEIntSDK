@@ -1,4 +1,5 @@
 import BLEIntSDK
+import Logging
 
 @objc(ReactNativeBleintSdk)
 class ReactNativeBleintSdk: NSObject {
@@ -24,8 +25,19 @@ class ReactNativeBleintSdk: NSObject {
 
             resolve(true)
         }
+        catch let error as BLEIntSDKError {
+            reject(
+                error.rawValue,
+                "Something went wrong while creating (\(error.errorDescription ?? error.localizedDescription))",
+                error
+            )
+        }
         catch {
-            reject("error", "Something went wrong while creating (\(error.localizedDescription))", error)
+            reject(
+                "error",
+                "Something went wrong while creating (\(error.localizedDescription))",
+                error
+            )
         }
     }
 
@@ -41,8 +53,19 @@ class ReactNativeBleintSdk: NSObject {
 
                 resolve(response.asDictionary)
             }
+            catch let error as BLEIntSDKError {
+                reject(
+                    error.rawValue,
+                    "Something went wrong while connecting to vehicle (\(error.errorDescription ?? error.localizedDescription))",
+                    error
+                )
+            }
             catch {
-                reject("error", "Something went wrong while connecting to vehicle (\(error.localizedDescription))", error)
+                reject(
+                    "error",
+                    "Something went wrong while connecting to vehicle (\(error.localizedDescription))",
+                    error
+                )
             }
         }
     }
@@ -63,8 +86,19 @@ class ReactNativeBleintSdk: NSObject {
                 let response = try await Self.client.sendCommand(type: command)
                 resolve(response.asDictionary)
             }
+            catch let error as BLEIntSDKError {
+                reject(
+                    error.rawValue,
+                    "Something went wrong while sending command to vehicle (\(error.errorDescription ?? error.localizedDescription))",
+                    error
+                )
+            }
             catch {
-                reject("error", "Something went wrong while sending command to vehicle (\(error.localizedDescription))", error)
+                reject(
+                    "error",
+                    "Something went wrong while sending command to vehicle (\(error.localizedDescription))",
+                    error
+                )
             }
         }
     }
@@ -79,8 +113,19 @@ class ReactNativeBleintSdk: NSObject {
                 let response = try await Self.client.endSession()
                 resolve(response.asDictionary)
             }
+            catch let error as BLEIntSDKError {
+                reject(
+                    error.rawValue,
+                    "Something went wrong while ending session (\(error.errorDescription ?? error.localizedDescription))",
+                    error
+                )
+            }
             catch {
-                reject("error", "Something went wrong while ending session (\(error.localizedDescription))", error)
+                reject(
+                    "error",
+                    "Something went wrong while ending session (\(error.localizedDescription))",
+                    error
+                )
             }
         }
     }

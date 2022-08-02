@@ -16,6 +16,11 @@ public struct SessionData {
         self.publicKey = publicKey
         self.commands = commands
     }
+
+    public var description: String {
+        return
+            "SessionData(publicKey: \"\(self.publicKey.description)\", accessToken: \"\(self.accessToken)\", commands: \"\(self.commands.description)\")"
+    }
 }
 
 public enum CommandType: String, CaseIterable {

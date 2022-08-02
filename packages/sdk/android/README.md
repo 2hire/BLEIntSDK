@@ -74,7 +74,7 @@ dependencies {
 
 Before creating a session with a vehicle, a server session must be created using [`start_offline_session`](../../../docs/endpoints.md#starting-a-offline-session) endpoint.
 
-Create a Client instance with data received from the endpoint.
+Create a Client instance with data received from the endpoint. See [errors](../../../docs/sdk.md#error-codes) for other error codes.
 
 ```kotlin
 import io.twohire.bleintsdk.client.*
@@ -96,82 +96,107 @@ val commands: Commands = mapOf(
     CommandType.EndSession to "end_session_command_payload"
 )
 
-// create session data
-val sessionConfig = SessionConfig(accessToken, publicKey, commands)
+try {
+    // create session data
+    val sessionConfig = SessionConfig(accessToken, publicKey, commands)
 
-// setup client with session data
-this.client.sessionSetup(applicationContext, sessionConfig)
+    // setup client with session data
+    this.client.sessionSetup(applicationContext, sessionConfig)
+} catch (e: BLEIntSDKException) {
+    if (e.error == BLEIntError.INVALID_DATA) {
+        // data supplied is not correct. e.g. wrong format?
+    }
+}
 ```
 
 ### Connect to a vehicle
 
-Connect to a board and start the session.
+Connect to a board and start the session. See [errors](../../../docs/sdk.md#error-codes) for other error codes.
 
 ```kotlin
 import io.twohire.bleintsdk.client.*
 
 // ...
 
+try {
 // board mac address is received from start_offline_session endpoint
-val boardMacAddress = "mac_address"
+    val boardMacAddress = "mac_address"
 
 // connect to vehicle using `boardMacAddress`
-val response = this.client.connect(applicationContext, boardMacAddress)
+    val response = this.client.connect(applicationContext, boardMacAddress)
 
 // convert response payload to base64
-val base64Response = Base64.encodeToString(response.additionalPayload, Base64.NO_WRAP)
+    val base64Response = Base64.encodeToString(response.additionalPayload, Base64.NO_WRAP)
 
 // save command response
-commandsHistory += base64Response
+    commandsHistory += base64Response
 
-println(base64Response)  // efab2331....
-println(response.success)  // true
+    println(base64Response)  // efab2331....
+    println(response.success)  // true
+} catch (e: BLEIntSDKException) {
+    if (e.error == BLEIntError.INVALID_SESSION) {
+        // session is not valid. e.g. call server to get a new one
+    }
+}
 ```
 
 ### Send command to vehicle
 
-Send a command to a vehicle. Available commands are _Start_ and _Stop_.
+Send a command to a vehicle. Available commands are _Start_ and _Stop_. See [errors](../../../docs/sdk.md#error-codes) for other error codes.
 
 ```kotlin
 import io.twohire.bleintsdk.client.*
 
 // ...
 
-// send a command to a connected vehicle
-val response = this.client.sendCommand(CommandType.Start)
+try {
+    // send a command to a connected vehicle
+    val response = this.client.sendCommand(CommandType.Start)
 
-// convert response payload to base64
-val base64Response = Base64.encodeToString(response.additionalPayload, Base64.NO_WRAP)
+    // convert response payload to base64
+    val base64Response = Base64.encodeToString(response.additionalPayload, Base64.NO_WRAP)
 
-// save command response
-commandsHistory += base64Response
+    // save command response
+    commandsHistory += base64Response
 
-println(base64Response)  // efab2331....
-println(response.success)  // true
+    println(base64Response)  // efab2331....
+    println(response.success)  // true
+} catch (e: BLEIntSDKException) {
+    if (e.error == BLEIntError.TIMEOUT) {
+        // command timed out. e.g. retry?
+    }
+}
 ```
 
 ### End board session
 
-End the board session and clear the client instance. After ending a board session all payloads received must be then sent back to the server using [`end_offline_session`](../../../docs/endpoints.md#ending-a-offline-session).
+End the board session and clear the client instance. After ending a board session all payloads received must be then sent back to the server using [`end_offline_session`](../../../docs/endpoints.md#ending-a-offline-session). See [errors](../../../docs/sdk.md#error-codes) for other error codes.
 
 ```kotlin
 import io.twohire.bleintsdk.client.*
 
 // ...
 
-// close the board session
-val response = this.client.endSession()
+try {
+    // close the board session
+    val response = this.client.endSession()
 
-// convert response payload to base64
-val base64Response = Base64.encodeToString(response.additionalPayload, Base64.NO_WRAP)
+    // convert response payload to base64
+    val base64Response = Base64.encodeToString(response.additionalPayload, Base64.NO_WRAP)
 
-// save command response
-commandsHistory += base64Response
+    // save command response
+    commandsHistory += base64Response
 
-println(base64Response)  // efab2331....
-println(response.success)  // true
+    println(base64Response)  // efab2331....
+    println(response.success)  // true
 
-// endServerSession(commandsHistory)
+    // endServerSession(commandsHistory)
+
+} catch (e: BLEIntSDKException) {
+    if (e.error == BLEIntError.TIMEOUT) {
+        // command timed out. e.g. retry?
+    }
+}
 ```
 
 ## Author

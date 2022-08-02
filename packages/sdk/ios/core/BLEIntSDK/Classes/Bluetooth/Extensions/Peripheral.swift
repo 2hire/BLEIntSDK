@@ -6,16 +6,15 @@
 
 import CoreBluetooth
 import Foundation
+import Logging
 import os.log
 
 extension BluetoothManager: CBPeripheralDelegate {
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard error == nil else {
-            return os_log(
-                "Found error while discovering services: %@",
-                log: .bluetooth,
-                type: .error,
-                error.debugDescription
+            return Self.logger.error(
+                "Found error while discovering services: \(error.debugDescription)",
+                metadata: .bluetooth
             )
         }
 
@@ -27,7 +26,7 @@ extension BluetoothManager: CBPeripheralDelegate {
             return
         }
 
-        os_log("Found service, discovering characteristics", log: .bluetooth, type: .debug)
+        Self.logger.info("Found service, discovering characteristics", metadata: .bluetooth)
         peripheral.discoverCharacteristics(nil, for: service)
     }
 
@@ -37,34 +36,37 @@ extension BluetoothManager: CBPeripheralDelegate {
         error: Error?
     ) {
         guard error == nil else {
-            return os_log(
-                "Found error while discovering characteristics: %@",
-                log: .bluetooth,
-                type: .error,
-                error.debugDescription
+            return Self.logger.error(
+                "Found error while discovering characteristics: \(error.debugDescription)",
+                metadata: .bluetooth
+
             )
         }
 
         for characteristic in service.characteristics ?? [] {
             if characteristic.uuid.uuidString == BluetoothConstants.WriteCharacteristic {
-                os_log(
-                    "Found write characteristic %{private}@",
-                    log: .bluetooth,
-                    type: .debug,
-                    BluetoothConstants.WriteCharacteristic
+                Self.logger.info(
+                    "Found write characteristic \(BluetoothConstants.WriteCharacteristic)",
+                    metadata: .bluetooth
                 )
                 self.writeCharacteristic = characteristic
             }
 
             if characteristic.uuid.uuidString == BluetoothConstants.ReadCharacteristic {
-                os_log(
-                    "Found read characteristic %{private}@",
-                    log: .bluetooth,
-                    type: .debug,
-                    BluetoothConstants.ReadCharacteristic
+                Self.logger.info(
+                    "Found read characteristic \(BluetoothConstants.ReadCharacteristic)",
+                    metadata: .bluetooth
                 )
                 self.readCharacteristic = characteristic
             }
         }
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+        guard error == nil else {
+            return Self.logger.error("Error while reading RSSI", metadata: .bluetooth)
+        }
+
+        Self.logger.info("RSSI value: \(RSSI.stringValue)", metadata: .bluetooth)
     }
 }

@@ -323,10 +323,12 @@ if (isNewArchitectureEnabled()) {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        dependencySubstitution {
-            substitute module('com.github.2hire:BLEIntSDK') using project(':twohire-bleintsdk-android')
+project(':twohire-react-native-bleintsdk') {
+    configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute module('com.github.2hire:BLEIntSDK') using project(':twohire-bleintsdk-android')
+            }
         }
     }
 }

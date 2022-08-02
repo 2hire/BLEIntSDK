@@ -1,8 +1,49 @@
 
 
-### [0.0.4](https://github.com/2hire/BLEIntSDK/compare/v0.0.2...v0.0.3) (2022-08-02)
+### [0.0.5](https://github.com/2hire/BLEIntSDK/compare/v0.0.3...v0.0.4) (2022-08-02)
 
-### [0.0.3](https://github.com/2hire/BLEIntSDK/compare/v0.0.2...v0.0.3) (2022-07-19)
+### [0.0.4](https://github.com/2hire/BLEIntSDK/compare/v0.0.3...v0.0.4) (2022-08-02)
+
+### [0.0.5](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.4...v0.0.5) (2022-08-02)
+
+
+### Features
+
+* **android:** add BLEIntSDKException ([ceffb77](https://github.com/2hire/BLEIntSDK-private/commit/ceffb7735c4fcf8eb6e23ce967a58114ccdcff18))
+* **android:** add invalid session error ([ac41a3d](https://github.com/2hire/BLEIntSDK-private/commit/ac41a3d20014dd456fbd43cc87adc15d63814654))
+* **cordova:** add support for BLEIntSDK custom errors ([7528aeb](https://github.com/2hire/BLEIntSDK-private/commit/7528aebe1fe856bc387e66bb4a2ec50f7b1bb4cf))
+* **example-ios:** log using google cloud ([bfe05b2](https://github.com/2hire/BLEIntSDK-private/commit/bfe05b2d0cd4a6ef04ee4f636e8e1858d0224a73))
+* **example-rn:** add google cloud logging ([aab3820](https://github.com/2hire/BLEIntSDK-private/commit/aab3820ddabb4453a0513afe1dd4b30bb76a4061))
+* **example-rn:** add hidden reset session button ([fe5416a](https://github.com/2hire/BLEIntSDK-private/commit/fe5416a7fd81fdb51fec57cc8f22fe82df601f98))
+* **example-rn:** change button dispositions ([7f4b952](https://github.com/2hire/BLEIntSDK-private/commit/7f4b952eca57ed226a70d802ebd1ba102c1edade))
+* **example-rn:** reset session data when receiving invalid_session error ([a7b21ad](https://github.com/2hire/BLEIntSDK-private/commit/a7b21ad82e0d2f82ead98bd52d7d6c1668f81ad8))
+* **example-rn:** save session to local storage ([4fd77d4](https://github.com/2hire/BLEIntSDK-private/commit/4fd77d44f0e7186f739f401bb333ad23819b314d))
+* **ios:** add BLEIntSDKError ([6ff10bf](https://github.com/2hire/BLEIntSDK-private/commit/6ff10bfbb74210812df071f7f74e47fd1d839586))
+* **ios:** add invalid session error ([b8413e7](https://github.com/2hire/BLEIntSDK-private/commit/b8413e76cadf13be33f58230c2c6d09cf3f3b573))
+* **ios:** add more contextual error logs ([e430c99](https://github.com/2hire/BLEIntSDK-private/commit/e430c9907d4c0f798da0d47d9f274d8fc3cad8d0))
+* **ios:** add more contextual logs ([b6eb82d](https://github.com/2hire/BLEIntSDK-private/commit/b6eb82d613f61564c66d6baef029bbb22486e69c))
+* **ios:** add SessionData description when creating Client ([4421af0](https://github.com/2hire/BLEIntSDK-private/commit/4421af06434f84d503838958f657e00363413eac))
+* **ios:** add swift-log logging api ([ec6f176](https://github.com/2hire/BLEIntSDK-private/commit/ec6f17626361b41d6142d996471b57e42a243159))
+* **ios:** board mac address logging ([2566e4f](https://github.com/2hire/BLEIntSDK-private/commit/2566e4f891b5d2bf9864668522b540471930d21d))
+* **ios:** change all logs to default ([04202d7](https://github.com/2hire/BLEIntSDK-private/commit/04202d73712b399920fd31527d774d75456ebb35))
+* **ios:** debug logs ([2db788b](https://github.com/2hire/BLEIntSDK-private/commit/2db788b8a8a7d57db51473a5414bf7a08752d372))
+* **ios:** log RSSI level when changing internal state ([a2f0384](https://github.com/2hire/BLEIntSDK-private/commit/a2f038415f3beb6650e0adfe68f7fc4246c1373a))
+* **rn-android:** add support for BLEIntSDKException ([9b116e1](https://github.com/2hire/BLEIntSDK-private/commit/9b116e10e582518d26f794ca79f1e8b58545acad))
+* **rn-ios:** add support for BLEIntSDKError ([7219b8d](https://github.com/2hire/BLEIntSDK-private/commit/7219b8d53ca10306541b5b77901a16203dbf9d28))
+* **types:** add `ErrorCode` type ([1ebb752](https://github.com/2hire/BLEIntSDK-private/commit/1ebb752082502ea070302e37cd0c8c054f4e4551))
+
+
+### Bug Fixes
+
+* **android:** check mac address of already connected peripheral ([d6d045c](https://github.com/2hire/BLEIntSDK-private/commit/d6d045cb66b380def0585e6422dbd9a0bcf7fb17))
+* **android:** error descriptions ([ef428e6](https://github.com/2hire/BLEIntSDK-private/commit/ef428e63794f357e2951c9fcccc15828fe02f641))
+* **example-rn:** 2aa auth before sending end_offline_session ([9806ad8](https://github.com/2hire/BLEIntSDK-private/commit/9806ad89911eb17bafa2aa5e47cd3caac6e627fb))
+* **example-rn:** disable test board ([8bddbcf](https://github.com/2hire/BLEIntSDK-private/commit/8bddbcfd9e6399923fd5f2978187227e9c3e3609))
+* **example-rn:** google credentials location ([029321d](https://github.com/2hire/BLEIntSDK-private/commit/029321dead19a3128d9331c734d190bdfbfaa9d9))
+* **example-rn:** reset local lastSession after end_session ([52d1a6f](https://github.com/2hire/BLEIntSDK-private/commit/52d1a6f27b01675b88fa35f5471088fbc5ee9be0))
+* **example-rn:** save session after bluetooth command ([553360e](https://github.com/2hire/BLEIntSDK-private/commit/553360e764f3a50a20a36d6d57e629e3ea343927))
+* **ios:** change log severity from error to info ([3cee96e](https://github.com/2hire/BLEIntSDK-private/commit/3cee96ef5ddeaa43bbe063cbfa819c6278be3fba))
+* **ios:** metadata and severity ([93ff889](https://github.com/2hire/BLEIntSDK-private/commit/93ff8893989a95067a57a5668eb96b44f1dbceaf))
 
 ### [0.0.4](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.3...v0.0.4) (2022-08-02)
 

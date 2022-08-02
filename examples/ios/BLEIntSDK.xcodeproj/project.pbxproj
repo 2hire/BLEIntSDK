@@ -171,6 +171,8 @@
 			dependencies = (
 			);
 			name = BLEIntSDK_Example;
+			packageProductDependencies = (
+			);
 			productName = BLEIntSDK;
 			productReference = 607FACD01AFB9204008FA782 /* BLEIntSDK_Example.app */;
 			productType = "com.apple.product-type.application";
@@ -227,6 +229,8 @@
 				Base,
 			);
 			mainGroup = 607FACC71AFB9204008FA782;
+			packageReferences = (
+			);
 			productRefGroup = 607FACD11AFB9204008FA782 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -267,6 +271,7 @@
 				"${BUILT_PRODUCTS_DIR}/2hire-K1/K1.framework",
 				"${BUILT_PRODUCTS_DIR}/2hire-secp256k1/secp256k1.framework",
 				"${BUILT_PRODUCTS_DIR}/BigInt/BigInt.framework",
+				"${BUILT_PRODUCTS_DIR}/Logging/Logging.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -274,6 +279,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/K1.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/secp256k1.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigInt.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Logging.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -6,20 +6,20 @@
 
 import CoreBluetooth
 import Foundation
+import Logging
 import os.log
 
 internal class BluetoothManager: NSObject {
     static let shared: BluetoothManager = BluetoothManager()
 
+    internal static let logger = LoggingUtil.logger
+
     var connectableState: WritableTLState = .Unknown {
         didSet {
             if oldValue != self.connectableState {
-                os_log(
-                    "Status changed (%@ -> %@)",
-                    log: .bluetooth,
-                    type: .debug,
-                    oldValue.description,
-                    self.connectableState.description
+                Self.logger.info(
+                    "Status changed (\(oldValue.description) -> \(self.connectableState.description))",
+                    metadata: .bluetooth
                 )
                 self.senderConnectableState = oldValue
 
@@ -27,8 +27,12 @@ internal class BluetoothManager: NSObject {
             }
 
             if let timer = self.timer {
-                os_log("Firing timer %@", log: .bluetooth, type: .debug, timer.description)
+                Self.logger.debug("Firing timer \(timer.description)", metadata: .bluetooth)
                 timer.fire()
+            }
+
+            if let peripheral = self.discoveredPeripheral, peripheral.state == .connected {
+                peripheral.readRSSI()
             }
         }
     }
@@ -67,18 +71,18 @@ internal class BluetoothManager: NSObject {
 extension BluetoothManager: WritableTL {
     func write(data: [UInt8]) throws {
         guard self.connectableState == .Connected else {
-            os_log("Bluetooth is not connected", log: .bluetooth, type: .error)
+            Self.logger.error("Bluetooth is not connected", metadata: .bluetooth)
 
             throw BluetoothError.NotConnected
         }
 
         guard let writeCharacteristic = self.writeCharacteristic else {
-            os_log("Write characteristic not found", log: .bluetooth, type: .error)
+            Self.logger.error("Write characteristic not found", metadata: .bluetooth)
             throw BluetoothError.CharacteristicNotFound
         }
 
         guard let peripheral = self.discoveredPeripheral else {
-            os_log("Peripheral not found", log: .bluetooth, type: .error)
+            Self.logger.error("Peripheral not found", metadata: .bluetooth)
             throw BluetoothError.PeripheralNotFound
         }
 
@@ -91,12 +95,9 @@ extension BluetoothManager: WritableTL {
         writeCharacteristic characteristic: CBCharacteristic
     ) {
         if self.writeBuffer.isEmpty {
-            os_log(
-                "Write buffer empty, current status %@, resetting to previous status %@",
-                log: .bluetooth,
-                type: .debug,
-                self.connectableState.description,
-                self.senderConnectableState.description
+            Self.logger.info(
+                "Write buffer empty, current status \(self.connectableState.description), resetting to previous status \(self.senderConnectableState.description)",
+                metadata: .bluetooth
             )
 
             self.connectableState = self.senderConnectableState
@@ -123,13 +124,11 @@ extension BluetoothManager: WritableTL {
 
         let chunkData = Data(self.writingChunk)
 
-        os_log(
-            "Scheduled write timer %{private}@",
-            log: .bluetooth,
-            type: .debug,
-            self.timer?.description ?? "Timer not set"
+        Self.logger.debug(
+            "Scheduled write timer \(self.timer?.description ?? "Timer not set")",
+            metadata: .bluetooth
         )
-        os_log("Writing chunk %{private}@", log: .bluetooth, type: .debug, chunkData.hexEncodedString)
+        Self.logger.debug("Writing chunk \(chunkData.hexEncodedString)", metadata: .bluetooth)
 
         peripheral.writeValue(chunkData, for: characteristic, type: .withResponse)
     }
@@ -142,21 +141,16 @@ extension BluetoothManager: WritableTL {
         guard error == nil else {
             self.connectableState = .Errored
 
-            return os_log(
-                "Found error while writing value for characteristic %{private}@: %@",
-                log: .bluetooth,
-                type: .error,
-                characteristic.uuid.uuidString,
-                error.debugDescription
+            return Self.logger.error(
+                "Found error while writing value for characteristic \(characteristic.uuid.uuidString): \( error.debugDescription)",
+                metadata: .bluetooth
             )
         }
 
         if self.connectableState == .Writing, let timer = self.timer, timer.isValid {
-            os_log(
-                "Writing chunk was successful, invalidating write timer %{private}@",
-                log: .bluetooth,
-                type: .debug,
-                timer.description
+            Self.logger.debug(
+                "Writing chunk was successful, invalidating write timer \(timer.description)",
+                metadata: .bluetooth
             )
             timer.invalidate()
             self.timer = nil
@@ -171,11 +165,9 @@ extension BluetoothManager: WritableTL {
 extension BluetoothManager {
     func startReading() throws {
         guard self.connectableState == .Connected else {
-            os_log(
-                "Bluetooth is not in Connected state: %@",
-                log: .bluetooth,
-                type: .error,
-                self.connectableState.description
+            Self.logger.error(
+                "Bluetooth is not in Connected state: \(self.connectableState.description)",
+                metadata: .bluetooth
             )
             throw BluetoothError.NotConnected
         }
@@ -185,11 +177,9 @@ extension BluetoothManager {
 
     func stopReading() throws {
         guard self.connectableState == .Reading else {
-            os_log(
-                "Bluetooth is not in Reading state: %@",
-                log: .bluetooth,
-                type: .error,
-                self.connectableState.description
+            Self.logger.error(
+                "Bluetooth is not in Reading state: \(self.connectableState.description)",
+                metadata: .bluetooth
             )
             throw BluetoothError.NotReading
         }
@@ -199,12 +189,12 @@ extension BluetoothManager {
 
     private func setNotificationState(value: Bool) throws {
         guard let readCharacteristic = self.readCharacteristic else {
-            os_log("Read characteristic not found", log: .bluetooth, type: .error)
+            Self.logger.error("Read characteristic not found", metadata: .bluetooth)
             throw BluetoothError.CharacteristicNotFound
         }
 
         guard let peripheral = self.discoveredPeripheral else {
-            os_log("Peripheral not found", log: .bluetooth, type: .error)
+            Self.logger.error("Peripheral not found", metadata: .bluetooth)
             throw BluetoothError.PeripheralNotFound
         }
 
@@ -212,11 +202,9 @@ extension BluetoothManager {
             withTimeInterval: BluetoothConstants.ReadTimeout,
             repeats: false,
             block: { timer in
-                os_log(
-                    "Read notification timer %{private}@",
-                    log: .bluetooth,
-                    type: .debug,
-                    timer.description
+                Self.logger.debug(
+                    "Read notification timer \(timer.description)",
+                    metadata: .bluetooth
                 )
                 self.timer = nil
                 self.connectableState = .Errored
@@ -224,19 +212,14 @@ extension BluetoothManager {
                 self.writableDelegate?.writable(didReceive: nil, BluetoothError.Timeout)
             }
         )
-        os_log(
-            "Scheduled read notification timer %{private}@",
-            log: .bluetooth,
-            type: .debug,
-            self.timer?.description ?? "Timer not set"
+        Self.logger.debug(
+            "Scheduled read notification timer \(self.timer?.description ?? "Timer not set")",
+            metadata: .bluetooth
         )
 
-        os_log(
-            "Setting read notifications value (%@) to characteristic %{private}@:",
-            log: .bluetooth,
-            type: .debug,
-            value.description,
-            peripheral.identifier.uuidString
+        Self.logger.info(
+            "Setting read notifications value (\(value.description)) to characteristic \(peripheral.identifier.uuidString):",
+            metadata: .bluetooth
         )
 
         peripheral.setNotifyValue(value, for: readCharacteristic)
@@ -248,7 +231,7 @@ extension BluetoothManager {
         error: Error?
     ) {
         guard error == nil else {
-            os_log("Error while reading new notification state", log: .bluetooth, type: .error)
+            Self.logger.error("Error while reading new notification state", metadata: .bluetooth)
 
             self.connectableState = .Errored
             self.writableDelegate?.writable(didReceive: nil, error)
@@ -257,27 +240,22 @@ extension BluetoothManager {
         }
 
         if characteristic.uuid.uuidString == BluetoothConstants.ReadCharacteristic {
-            os_log(
-                "Notification state updated to %@ for characteristic %{private}@",
-                log: .bluetooth,
-                type: .debug,
-                characteristic.isNotifying.description,
-                characteristic.uuid.uuidString
+            Self.logger.info(
+                "Notification state updated to \(characteristic.isNotifying.description) for characteristic \( characteristic.uuid.uuidString)",
+                metadata: .bluetooth
             )
 
             // check if we still need to notify this change
             if let timer = self.timer, timer.isValid {
-                os_log(
-                    "Invalidating read notification state timeout timer %{private}@",
-                    log: .bluetooth,
-                    type: .debug,
-                    timer.description
+                Self.logger.debug(
+                    "Invalidating read notification state timeout timer \( timer.description)",
+                    metadata: .bluetooth
                 )
                 timer.invalidate()
                 self.timer = nil
             }
             else {
-                os_log("Timer is not set", log: .bluetooth, type: .debug)
+                Self.logger.debug("Timer is not set", metadata: .bluetooth)
             }
 
             if characteristic.isNotifying {
@@ -288,11 +266,9 @@ extension BluetoothManager {
                     withTimeInterval: BluetoothConstants.ReadTimeout,
                     repeats: false,
                     block: { timer in
-                        os_log(
-                            "Read packet timer %{private}@",
-                            log: .bluetooth,
-                            type: .debug,
-                            timer.description
+                        Self.logger.debug(
+                            "Read packet timer \(timer.description)",
+                            metadata: .bluetooth
                         )
 
                         self.timer = nil
@@ -305,11 +281,9 @@ extension BluetoothManager {
                     }
                 )
 
-                os_log(
-                    "Scheduled read packet timer %{private}@",
-                    log: .bluetooth,
-                    type: .debug,
-                    self.timer?.description ?? "Timer not set"
+                Self.logger.debug(
+                    "Scheduled read packet timer \( self.timer?.description ?? "Timer not set")",
+                    metadata: .bluetooth
                 )
             }
             else if self.connectableState != .Errored {
@@ -325,23 +299,18 @@ extension BluetoothManager {
         error: Error?
     ) {
         if let timer = self.timer, timer.isValid {
-            os_log(
-                "Invalidating any existing timer %{private}@",
-                log: .bluetooth,
-                type: .debug,
-                timer.description
+            Self.logger.debug(
+                "Invalidating any existing timer \(timer.description)",
+                metadata: .bluetooth
             )
             timer.invalidate()
             self.timer = nil
         }
 
         guard error == nil else {
-            os_log(
-                "Found error while getting value for characteristic %{private}@:",
-                log: .bluetooth,
-                type: .error,
-                characteristic.uuid.uuidString,
-                error.debugDescription
+            Self.logger.error(
+                "Found error while getting value for characteristic \(characteristic.uuid.uuidString): \(error.debugDescription)",
+                metadata: .bluetooth
             )
             self.connectableState = .Errored
 
@@ -350,22 +319,17 @@ extension BluetoothManager {
         }
 
         guard characteristic.uuid.uuidString == BluetoothConstants.ReadCharacteristic else {
-            os_log(
-                "Characteristic %{private}@ not matching %{private}@, skipping",
-                log: .bluetooth,
-                type: .debug,
-                characteristic.uuid.uuidString,
-                BluetoothConstants.ReadCharacteristic
+            Self.logger.info(
+                "Characteristic \(characteristic.uuid.uuidString) not matching \( BluetoothConstants.ReadCharacteristic), skipping",
+                metadata: .bluetooth
             )
             return
         }
 
         guard let value = characteristic.value else {
-            os_log(
-                "No value for characteristic %{private}@",
-                log: .bluetooth,
-                type: .debug,
-                characteristic.uuid.uuidString
+            Self.logger.info(
+                "No value for characteristic \(characteristic.uuid.uuidString)",
+                metadata: .bluetooth
             )
 
             self.writableDelegate?.writable(didReceive: [], nil)
@@ -393,7 +357,7 @@ extension BluetoothManager: ConnectableTL {
         guard self.connectableState == .Created else {
             self.connectableState = .Errored
 
-            os_log("Bluetooth creation timer error", log: .bluetooth, type: .debug)
+            Self.logger.error("Bluetooth creation timer error", metadata: .bluetooth)
             self.connectableDelegate?.create(didCreate: nil, BluetoothError.Timeout)
 
             return
@@ -402,18 +366,16 @@ extension BluetoothManager: ConnectableTL {
         let gattService = CBUUID(string: BluetoothConstants.GattService)
         self.connectableDelegate?.create(didCreate: true, nil)
 
-        os_log(
-            "Looking for connected peripherals with GATT service %{private}@",
-            log: .bluetooth,
-            type: .debug,
-            BluetoothConstants.GattService
+        Self.logger.info(
+            "Looking for connected peripherals with GATT service \(BluetoothConstants.GattService)",
+            metadata: .bluetooth
         )
 
         let connectedPeripherals = self.centralManager.retrieveConnectedPeripherals(withServices: [
             gattService
         ])
 
-        os_log("Starting interface startup Timer", log: .bluetooth, type: .debug)
+        Self.logger.debug("Starting interface startup Timer", metadata: .bluetooth)
         self.timer = Timer.scheduledTimer(
             timeInterval: BluetoothConstants.ConnectionTimeout,
             target: self,
@@ -423,18 +385,16 @@ extension BluetoothManager: ConnectableTL {
         )
 
         if let lastConnected = connectedPeripherals.last {
-            os_log(
-                "Connecting to peripheral: %@",
-                log: .bluetooth,
-                type: .debug,
-                lastConnected.identifier.uuidString
+            Self.logger.info(
+                "Connecting to peripheral:\(lastConnected.identifier.uuidString)",
+                metadata: .bluetooth
             )
 
             self.discoveredPeripheral = lastConnected
             self.centralManager.connect(lastConnected, options: nil)
         }
         else {
-            os_log("Scanning for peripherals", log: .bluetooth, type: .debug)
+            Self.logger.info("Scanning for peripherals", metadata: .bluetooth)
             self.centralManager.scanForPeripherals(
                 withServices: [gattService],
                 options: [CBCentralManagerScanOptionAllowDuplicatesKey: true]
@@ -448,7 +408,7 @@ extension BluetoothManager: ConnectableTL {
         guard self.connectableState == .Connected else {
             self.connectableState = .Errored
 
-            os_log("Bluetooth connection timer error", log: .bluetooth, type: .debug)
+            Self.logger.error("Bluetooth connection timer error", metadata: .bluetooth)
             self.connectableDelegate?.connect(didConnect: nil, BluetoothError.Timeout)
 
             self.centralManager.stopScan()
@@ -460,7 +420,7 @@ extension BluetoothManager: ConnectableTL {
 
     func connect(to macAddress: String) throws {
         guard self.timer == nil else {
-            os_log("Bluetooth Api misuse, an action is already running", log: .bluetooth, type: .debug)
+            Self.logger.error("Bluetooth Api misuse, an action is already running", metadata: .bluetooth)
             throw BluetoothError.ApiMisuse
         }
 
@@ -470,7 +430,7 @@ extension BluetoothManager: ConnectableTL {
 
         self.macAddress = macAddress
 
-        os_log("Starting bluetooth connection timer", log: .bluetooth, type: .debug)
+        Self.logger.debug("Starting bluetooth connection timer", metadata: .bluetooth)
         self.timer = Timer.scheduledTimer(
             timeInterval: BluetoothConstants.StartupTimeout,
             target: self,
@@ -483,8 +443,14 @@ extension BluetoothManager: ConnectableTL {
     }
 }
 
-extension OSLog {
-    private static var subsystem = Bundle.main.bundleIdentifier ?? "BundleIdentifier not set"
+extension Logging.Logger.Metadata {
+    static var bluetooth: Self {
+        var metadata: Self = ["category": "🪀 BluetoothManager"]
 
-    static let bluetooth = OSLog(subsystem: subsystem, category: "🪀 BluetoothManager")
+        if let requestId = Self.requestId {
+            metadata["requestId"] = "\(requestId)"
+        }
+
+        return metadata
+    }
 }

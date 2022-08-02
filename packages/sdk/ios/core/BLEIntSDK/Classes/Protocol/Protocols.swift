@@ -6,7 +6,7 @@
 
 import Foundation
 
-@objc public enum WritableTLState: Int {
+internal enum WritableTLState: Int {
     case Reading
     case Writing
     case Connected
@@ -15,20 +15,20 @@ import Foundation
     case Unknown
 }
 
-public protocol ConnectableTL {
+internal protocol ConnectableTL {
     var connectableDelegate: ConnectableTLDelegate? { get set }
 
     func connect(to address: String) throws
 }
 
-public protocol ConnectableTLDelegate {
+internal protocol ConnectableTLDelegate {
     func connection(didChangeState state: WritableTLState)
 
     func create(didCreate data: Any?, _ error: Error?)
     func connect(didConnect data: Any?, _ error: Error?)
 }
 
-public protocol WritableTL: ConnectableTL {
+internal protocol WritableTL: ConnectableTL {
     var writableDelegate: WritableTLDelegate? { get set }
 
     func write(data: [UInt8]) throws
@@ -37,10 +37,14 @@ public protocol WritableTL: ConnectableTL {
     func stopReading() throws
 }
 
-public protocol WritableTLDelegate {
+internal protocol WritableTLDelegate {
     func writable(didReceive data: [UInt8]?, _ error: Error?)
 
     func writable(didWrite remainingData: [UInt8], _ error: Error?)
 
     func writable(didStopReading: Bool, _ error: Error?)
+}
+
+internal protocol ProtocolManagerDelegate {
+    func state(didChange state: WritableTLState)
 }

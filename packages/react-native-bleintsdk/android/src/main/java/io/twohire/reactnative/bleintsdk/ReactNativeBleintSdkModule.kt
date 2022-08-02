@@ -3,6 +3,7 @@ package  io.twohire.reactnative.bleintsdk
 import android.util.Base64
 import com.facebook.react.bridge.*
 import io.twohire.bleintsdk.client.*
+import io.twohire.bleintsdk.utils.BLEIntSDKException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -48,6 +49,14 @@ class ReactNativeBleIntSdkModule(reactContext: ReactApplicationContext) :
 
                 promise.resolve(true)
             }
+        } catch (sdkException: BLEIntSDKException) {
+            sdkException.printStackTrace()
+
+            promise.reject(
+                sdkException.error.code,
+                "Something went wrong while creating ${sdkException.error.description}",
+                sdkException
+            )
         } catch (error: Exception) {
             error.printStackTrace()
 
@@ -64,6 +73,14 @@ class ReactNativeBleIntSdkModule(reactContext: ReactApplicationContext) :
                         it.connectToVehicle(address, reactApplicationContext).toWritableMap()
                     )
                 }
+            } catch (sdkException: BLEIntSDKException) {
+                sdkException.printStackTrace()
+
+                promise.reject(
+                    sdkException.error.code,
+                    "Something went wrong while connecting to vehicle ${sdkException.error.description}",
+                    sdkException
+                )
             } catch (error: Exception) {
                 error.printStackTrace()
 
@@ -92,6 +109,14 @@ class ReactNativeBleIntSdkModule(reactContext: ReactApplicationContext) :
                         IllegalStateException("BadDataError")
                     )
                 }
+            } catch (sdkException: BLEIntSDKException) {
+                sdkException.printStackTrace()
+
+                promise.reject(
+                    sdkException.error.code,
+                    "Something went wrong while sending command to vehicle ${sdkException.error.description}",
+                    sdkException
+                )
             } catch (error: Exception) {
                 error.printStackTrace()
 
@@ -112,6 +137,14 @@ class ReactNativeBleIntSdkModule(reactContext: ReactApplicationContext) :
 
                     promise.resolve(response.toWritableMap())
                 }
+            } catch (sdkException: BLEIntSDKException) {
+                sdkException.printStackTrace()
+
+                promise.reject(
+                    sdkException.error.code,
+                    "Something went wrong while ending session ${sdkException.error.description}",
+                    sdkException
+                )
             } catch (error: Exception) {
                 error.printStackTrace()
 

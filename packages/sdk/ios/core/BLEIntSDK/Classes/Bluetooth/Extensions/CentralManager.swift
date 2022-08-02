@@ -6,54 +6,52 @@
 
 import CoreBluetooth
 import Foundation
+import Logging
 import os.log
 
 extension BluetoothManager: CBCentralManagerDelegate {
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .poweredOn:
-            os_log("[CBManager]: is powered on", log: .bluetooth, type: .debug)
+            Self.logger.info("[CBManager]: is powered on", metadata: .bluetooth)
             break
         case .poweredOff:
-            os_log("[CBManager]: is not powered on", log: .bluetooth, type: .debug)
+            Self.logger.info("[CBManager]: is not powered on", metadata: .bluetooth)
             break
         case .resetting:
-            os_log("[CBManager]: is resetting", log: .bluetooth, type: .debug)
+            Self.logger.info("[CBManager]: is resetting", metadata: .bluetooth)
             break
         case .unauthorized:
             if #available(iOS 13.0, *) {
                 switch central.authorization {
                 case .denied:
-                    os_log(
+                    Self.logger.info(
                         "[CBManager]: You are not authorised to use Bluetooth",
-                        log: .bluetooth,
-                        type: .debug
+                        metadata: .bluetooth
                     )
                 case .restricted:
-                    os_log("[CBManager]: Bluetooth is restricted", log: .bluetooth, type: .debug)
+                    Self.logger.info("[CBManager]: Bluetooth is restricted", metadata: .bluetooth)
                 default:
-                    os_log("[CBManager]: Unexpected authorisation", log: .bluetooth, type: .debug)
+                    Self.logger.info("[CBManager]: Unexpected authorisation", metadata: .bluetooth)
                 }
             }
             else {
-                os_log("[CBManager]: Unknown status", log: .bluetooth, type: .debug)
+                Self.logger.info("[CBManager]: Unknown status", metadata: .bluetooth)
             }
             break
         case .unknown:
-            os_log("[CBManager]: state is unknown", log: .bluetooth, type: .debug)
+            Self.logger.info("[CBManager]: state is unknown", metadata: .bluetooth)
             break
         case .unsupported:
-            os_log(
+            Self.logger.info(
                 "[CBManager]: Bluetooth is not supported on this device",
-                log: .bluetooth,
-                type: .debug
+                metadata: .bluetooth
             )
             break
         @unknown default:
-            os_log(
+            Self.logger.info(
                 "[CBManager]: A previously unknown central manager state occurred",
-                log: .bluetooth,
-                type: .debug
+                metadata: .bluetooth
             )
             break
         }
@@ -73,55 +71,51 @@ extension BluetoothManager: CBCentralManagerDelegate {
         rssi RSSI: NSNumber
     ) {
         guard let macAddress = self.macAddress else {
-            return os_log("MAC address not set, skipping", log: .bluetooth, type: .debug)
+            return Self.logger.info("MAC address not set, skipping", metadata: .bluetooth)
         }
 
-        os_log("Peripheral found", log: .bluetooth, type: .debug)
+        Self.logger.info("Peripheral found", metadata: .bluetooth)
 
         guard let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String else {
-            return os_log("Couldn't find peripheral's name, skipping", log: .bluetooth, type: .debug)
+            return Self.logger.info("Couldn't find peripheral's name, skipping", metadata: .bluetooth)
         }
 
         let nameComponents = name.components(separatedBy: BluetoothConstants.DeviceNameSeparator)
         guard let first = nameComponents.first, first == BluetoothConstants.DeviceNamePrefix else {
-            return os_log(
-                "Name %@ does not conforms to protocol, skipping",
-                log: .bluetooth,
-                type: .debug,
-                name
+            return Self.logger.info(
+                "Name \(name) does not conforms to protocol, skipping",
+                metadata: .bluetooth
             )
         }
 
-        guard let last = nameComponents.last, last == macAddress else {
-            return os_log(
-                "MAC address doesn't match with %{private}@, skipping",
-                log: .bluetooth,
-                type: .debug,
-                macAddress
+        guard let last = nameComponents.last else {
+            return Self.logger.info("MAC address not found", metadata: .bluetooth)
+        }
+
+        guard last == macAddress else {
+            return Self.logger.info(
+                "MAC address \"\(last)\" doesn't match with \"\(macAddress)\", skipping",
+                metadata: .bluetooth
             )
         }
 
-        os_log(
-            "Peripheral found %@, stopping scan",
-            log: .bluetooth,
-            type: .debug,
-            peripheral.identifier.uuidString
+        Self.logger.info(
+            "Peripheral found \(peripheral.identifier.uuidString), stopping scan",
+            metadata: .bluetooth
         )
         self.centralManager.stopScan()
 
         peripheral.delegate = self
         self.discoveredPeripheral = peripheral
 
-        os_log("Connecting to peripheral", log: .bluetooth, type: .debug)
+        Self.logger.info("Connecting to peripheral", metadata: .bluetooth)
         self.centralManager.connect(peripheral)
     }
 
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        os_log(
-            "Connected with peripheral %@, discovering services",
-            log: .bluetooth,
-            type: .debug,
-            peripheral.description
+        Self.logger.info(
+            "Connected with peripheral \(peripheral.description), discovering services",
+            metadata: .bluetooth
         )
 
         peripheral.discoverServices([CBUUID(string: BluetoothConstants.GattService)])
@@ -132,7 +126,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
         didDisconnectPeripheral peripheral: CBPeripheral,
         error: Error?
     ) {
-        os_log("Disconnected from peripheral %@", log: .bluetooth, type: .debug, peripheral.description)
+        Self.logger.info("Disconnected from peripheral \(peripheral.description)", metadata: .bluetooth)
 
         self.connectableState = .Unknown
     }

@@ -32,7 +32,7 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 Before creating a session with a vehicle, a server session must be created using [`start_offline_session`](../../../../docs/endpoints.md#starting-a-offline-session) endpoint.
 
-Create a BLEIntSDK Client instance with data received from the endpoint.
+Create a BLEIntSDK Client instance with data received from the endpoint. See [errors](../../../../docs/sdk.md#error-codes) for other error codes.
 
 ```swift
 import BLEIntSDK
@@ -58,85 +58,113 @@ let commands: Commands = [
         "end_session_command_payload",
 ]
 
-// create session data
-let sessionData = SessionData(accessToken: accessDataToken, publicKey: publicKey, commands: commands)
+do {
+    // create session data
+    let sessionData = SessionData(accessToken: accessDataToken, publicKey: publicKey, commands: commands)
 
-// setup client with session data
-try client.sessionSetup(
-    with: sessionData
-)
+    // setup client with session data
+    try client.sessionSetup(
+        with: sessionData
+    )
+}
+catch let error as BLEIntSDKError {
+    if error  == .InvalidData {
+        // data supplied is not correct. e.g. wrong format?
+    }
+}
 ```
 
 ### Connect to a vehicle
 
-Connect to a board and start the session.
+Connect to a board and start the session. See [errors](../../../../docs/sdk.md#error-codes) for other error codes.
 
 ```swift
 import BLEIntSDK
 
 // ...
 
-// board mac address is received from start_offline_session endpoint
-let boardMacAddress = "mac_address"
+do {
+    // board mac address is received from start_offline_session endpoint
+    let boardMacAddress = "mac_address"
 
-// connect to vehicle using `boardMacAddress`
-let response = try await client.connectToVehicle(withIdentifier: boardMacAddress)
+    // connect to vehicle using `boardMacAddress`
+    let response = try await client.connectToVehicle(withIdentifier: boardMacAddress)
 
-// convert response payload to base64
-let base64Response = Data(response.additionalPayload).base64EncodedString()
+    // convert response payload to base64
+    let base64Response = Data(response.additionalPayload).base64EncodedString()
 
-// save command response
-commandsHistory.append(base64Response)
+    // save command response
+    commandsHistory.append(base64Response)
 
-print(base64Response) // efab2331...
-print(response.success.description)  // true
-
+    print(base64Response)  // efab2331...
+    print(response.success.description)  // true
+}
+catch let error as BLEIntSDKError {
+    if error  == .InvalidSession {
+        // session is not valid. e.g. call server o get a new one
+    }
+}
 ```
 
 ### Send command to vehicle
 
-Here's an example to send the _Start_ command to a vehicle. Available commands are _Start_ and _Stop_.
+Here's an example to send the _Start_ command to a vehicle. Available commands are _Start_ and _Stop_. See [errors](../../../../docs/sdk.md#error-codes) for other error codes.
 
 ```swift
 import BLEIntSDK
 
 // ...
 
-// send a command to a connected vehicle
-let response = try await client.sendCommand(type: .Start)
+do {
+    // send a command to a connected vehicle
+    let response = try await client.sendCommand(type: .Start)
 
-// convert response payload to base64
-let base64Response = Data(response.additionalPayload).base64EncodedString()
+    // convert response payload to base64
+    let base64Response = Data(response.additionalPayload).base64EncodedString()
 
-// save command response
-commandsHistory.append(base64Response)
+    // save command response
+    commandsHistory.append(base64Response)
 
-print(base64Response) // efab2331...
-print(response.success.description)  // true
+    print(base64Response) // efab2331...
+    print(response.success.description)  // true
+}
+catch let error as BLEIntSDKError {
+    if error == .Timeout {
+        // command timed out. e.g. retry?
+    }
+}
 ```
 
 ### End session
 
-End the board session and clear the client instance. After ending a board session all payloads received must be then sent back to the server using [`end_offline_session`](../../../../docs/endpoints.md#ending-a-offline-session).
+End the board session and clear the client instance. After ending a board session all payloads received must be then sent back to the server using [`end_offline_session`](../../../../docs/endpoints.md#ending-a-offline-session). See [errors](../../../../docs/sdk.md#error-codes) for other error codes.
 
 ```swift
 import BLEIntSDK
 
 // ...
 
-// close the board session
-let response = try await client.endSession()
+do {
+    // close the board session
+    let response = try await client.endSession()
 
-// convert response payload to base64
-let base64Response = Data(response.additionalPayload).base64EncodedString()
+    // convert response payload to base64
+    let base64Response = Data(response.additionalPayload).base64EncodedString()
 
-// save command response
-commandsHistory.append(base64Response)
+    // save command response
+    commandsHistory.append(base64Response)
 
-print(base64Response) // efab2331...
-print(response.success.description)  // true
+    print(base64Response)  // efab2331...
+    print(response.success.description)  // true
 
-// endServerSession(with: commandsHistory)
+    // endServerSession(with: commandsHistory)
+
+}
+catch let error as BLEIntSDKError {
+    if error == .Timeout {
+        // command timed out. e.g. retry?
+    }
+}
 ```
 
 ## Author

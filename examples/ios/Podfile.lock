@@ -1,13 +1,16 @@
 PODS:
-  - 2hire-BLEIntSDK (0.1.0):
-    - 2hire-K1 (= 0.1.0)
-  - 2hire-BLEIntSDK/Tests (0.1.0):
-    - 2hire-K1 (= 0.1.0)
-  - 2hire-K1 (0.1.0):
-    - 2hire-secp256k1 (= 0.1.0)
+  - 2hire-BLEIntSDK (0.0.2):
+    - 2hire-K1 (= 0.0.2)
+    - Logging (~> 1.4)
+  - 2hire-BLEIntSDK/Tests (0.0.2):
+    - 2hire-K1 (= 0.0.2)
+    - Logging (~> 1.4)
+  - 2hire-K1 (0.0.2):
+    - 2hire-secp256k1 (= 0.0.2)
     - BigInt (~> 5.2)
-  - 2hire-secp256k1 (0.1.0)
+  - 2hire-secp256k1 (0.0.2)
   - BigInt (5.2.0)
+  - Logging (1.4.0)
 
 DEPENDENCIES:
   - 2hire-BLEIntSDK (from `../..`)
@@ -18,6 +21,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - BigInt
+    - Logging
 
 EXTERNAL SOURCES:
   2hire-BLEIntSDK:
@@ -28,10 +32,11 @@ EXTERNAL SOURCES:
     :path: "../.."
 
 SPEC CHECKSUMS:
-  2hire-BLEIntSDK: 19c6121568879d66de506a69c29662e2beb96156
-  2hire-K1: b3fc38a01d2a583d221965956ea9d66da1a332ae
-  2hire-secp256k1: 0207da2ccf78586c7ca557efd16961615252a191
+  2hire-BLEIntSDK: 09aaec381616d9ca8efe2405523395ecb1b321b1
+  2hire-K1: 04651c3bfee10ad7b3312376ed6840fca2fd7df9
+  2hire-secp256k1: 6e630444b8daf6519a353f32081cc9ab48b29c76
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
+  Logging: beeb016c9c80cf77042d62e83495816847ef108b
 
 PODFILE CHECKSUM: 7ed4f3470b1017d4a33a8efdd0aa72ab851782ed
 

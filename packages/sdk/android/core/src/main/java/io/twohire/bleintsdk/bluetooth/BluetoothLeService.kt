@@ -233,11 +233,11 @@ internal class BluetoothLeService : Service(), WritableTL {
 
         if (bluetoothManager.adapter.isEnabled) {
             val device = this.device
+            val parsedAddress = checkAndParseBluetoothAddress(address)
 
-            if (device !== null) {
+            if (device !== null && parsedAddress == device.address) {
                 this.connectToDevice(device)
             } else {
-                val parsedAddress = checkAndParseBluetoothAddress(address)
                 val filters = getScanFilters(parsedAddress)
 
                 this.startScan(filters)
