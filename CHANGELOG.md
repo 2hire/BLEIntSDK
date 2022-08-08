@@ -1,8 +1,20 @@
 
 
-### [0.0.5](https://github.com/2hire/BLEIntSDK/compare/v0.0.3...v0.0.4) (2022-08-02)
+### [0.0.6](https://github.com/2hire/BLEIntSDK/compare/v0.0.4...v0.0.5) (2022-08-08)
 
-### [0.0.4](https://github.com/2hire/BLEIntSDK/compare/v0.0.3...v0.0.4) (2022-08-02)
+### [0.0.5](https://github.com/2hire/BLEIntSDK/compare/v0.0.4...v0.0.5) (2022-08-02)
+
+### [0.0.6](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.5...v0.0.6) (2022-08-08)
+
+
+### Features
+
+* **example-rn:** add create session response alert ([be5f906](https://github.com/2hire/BLEIntSDK-private/commit/be5f906c20509cd239544c99206bcff99cd22b90))
+
+
+### Bug Fixes
+
+* **ios:** prevent getting core `API MISUSE` error when reconnecting to the same peripheral ([a8082e4](https://github.com/2hire/BLEIntSDK-private/commit/a8082e4f7a5c7e549710b82c61e90b0b39908152))
 
 ### [0.0.5](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.4...v0.0.5) (2022-08-02)
 

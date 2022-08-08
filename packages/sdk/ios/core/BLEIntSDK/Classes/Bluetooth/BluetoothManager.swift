@@ -386,7 +386,7 @@ extension BluetoothManager: ConnectableTL {
 
         if let lastConnected = connectedPeripherals.last {
             Self.logger.info(
-                "Connecting to peripheral:\(lastConnected.identifier.uuidString)",
+                "Connecting to peripheral: \(lastConnected.identifier.uuidString)",
                 metadata: .bluetooth
             )
 

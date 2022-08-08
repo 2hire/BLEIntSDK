@@ -105,7 +105,6 @@ extension BluetoothManager: CBCentralManagerDelegate {
         )
         self.centralManager.stopScan()
 
-        peripheral.delegate = self
         self.discoveredPeripheral = peripheral
 
         Self.logger.info("Connecting to peripheral", metadata: .bluetooth)
@@ -118,6 +117,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
             metadata: .bluetooth
         )
 
+        peripheral.delegate = self
         peripheral.discoverServices([CBUUID(string: BluetoothConstants.GattService)])
     }
 

@@ -131,7 +131,7 @@ export default function App() {
           reports.current.push(res.payload);
         }
 
-        showAlert(res);
+        showCommandResponseAlert(res);
       } catch (e) {
         if (isNativeError(e) && e.code === 'invalid_session') {
           resetSession();
@@ -234,6 +234,7 @@ export default function App() {
 
               identifier.current = macAddressBox;
 
+              Alert.alert('Create session', 'Session created!');
               console.log(response);
             }
           } catch (e) {
@@ -322,7 +323,7 @@ const ResetButton = styled(TouchableOpacity)`
   position: absolute;
 `;
 
-const showAlert = (res: SDK.CommandResponse | boolean) =>
+const showCommandResponseAlert = (res: SDK.CommandResponse | boolean) =>
   Alert.alert(
     'Command Response',
     res === null
