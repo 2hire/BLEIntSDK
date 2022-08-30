@@ -29,7 +29,6 @@ const publicKey = "board_public_key";
 const commands: SDK.Commands = {
   start: "start_command_payload",
   stop: "stop_command_payload",
-  noop: "noop_command_payload",
   end_session: "end_session_command_payload",
 };
 

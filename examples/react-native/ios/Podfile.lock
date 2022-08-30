@@ -1,14 +1,14 @@
 PODS:
-  - 2hire-BLEIntSDK (0.0.2):
-    - 2hire-K1 (= 0.0.2)
+  - 2hire-BLEIntSDK (0.0.6):
+    - 2hire-K1 (= 0.0.6)
     - Logging (~> 1.4)
-  - 2hire-K1 (0.0.2):
-    - 2hire-secp256k1 (= 0.0.2)
+  - 2hire-K1 (0.0.6):
+    - 2hire-secp256k1 (= 0.0.6)
     - BigInt (~> 5.2)
-  - 2hire-react-native-bleintsdk (0.0.2):
-    - 2hire-BLEIntSDK (~> 0.0.2)
+  - 2hire-react-native-bleintsdk (0.0.6):
+    - 2hire-BLEIntSDK (~> 0.0.6)
     - React-Core
-  - 2hire-secp256k1 (0.0.2)
+  - 2hire-secp256k1 (0.0.6)
   - BigInt (5.2.0)
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
@@ -523,10 +523,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  2hire-BLEIntSDK: 09aaec381616d9ca8efe2405523395ecb1b321b1
-  2hire-K1: 04651c3bfee10ad7b3312376ed6840fca2fd7df9
-  2hire-react-native-bleintsdk: 30238d0c6265d9ae99718a7e268d93dd615dd98a
-  2hire-secp256k1: 6e630444b8daf6519a353f32081cc9ab48b29c76
+  2hire-BLEIntSDK: 86af58cc27f75acbedfeca9df9d16ca548c1f399
+  2hire-K1: 16a77ece8d5fe281df6954d3e5537d25a2ebfe8b
+  2hire-react-native-bleintsdk: 9130482652ba0b055e6830853ac0afce41831129
+  2hire-secp256k1: 4454a4cfc2b8aea6d1bfc953cae2d94184e339e0
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99

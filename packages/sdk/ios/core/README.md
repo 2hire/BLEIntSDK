@@ -52,8 +52,6 @@ let commands: Commands = [
         "start_command_payload",
     .Stop:
         "stop_command_payload",
-    .Noop:
-        "noop_command_payload",
     .EndSession:
         "end_session_command_payload",
 ]

@@ -26,7 +26,6 @@ public struct SessionData {
 public enum CommandType: String, CaseIterable {
     case Start = "start"
     case Stop = "stop"
-    case Noop = "noop"
     case EndSession = "end_session"
 }
 

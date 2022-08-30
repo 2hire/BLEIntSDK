@@ -4,8 +4,10 @@ import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
-import java.io.ByteArrayOutputStream
+import io.twohire.bleintsdk.utils.toByteArray
+import io.twohire.bleintsdk.utils.toHex
 import java.io.File
+import java.nio.charset.StandardCharsets
 
 class KeyStore {
     companion object {
@@ -17,8 +19,7 @@ class KeyStore {
             val privateKey = CryptoHelper.exportPKCS8PrivateKey(key.privateKey)
             val publicKey = CryptoHelper.compactPublicKey(key.publicKey)
 
-            val data = publicKey + privateKey
-
+            val data = (publicKey + privateKey).toHex().toByteArray(StandardCharsets.UTF_8)
             Log.d(tag, "Saving KeyPair in keystore")
 
             val file = getFile(context).also {
@@ -35,15 +36,10 @@ class KeyStore {
         private fun getPrivateKey(context: Context): ECKeyPair {
             val encryptedFile = getEncryptedFile(getFile(context), context)
 
-            val inputStream = encryptedFile.openFileInput()
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            var nextByte: Int = inputStream.read()
-
-            while (nextByte != -1) {
-                byteArrayOutputStream.write(nextByte)
-                nextByte = inputStream.read()
-            }
-            val byteArray = byteArrayOutputStream.toByteArray()
+            val bufferedReader =
+                encryptedFile.openFileInput().bufferedReader(StandardCharsets.UTF_8)
+            val byteArray = bufferedReader.readText().toByteArray()
+            bufferedReader.close()
 
             val publicKey = CryptoHelper.wrapPublicKey(byteArray.sliceArray(0 until 33))
             val privateKey = CryptoHelper.wrapPKCS8PrivateKey(byteArray.drop(33).toByteArray())
@@ -70,6 +66,8 @@ class KeyStore {
                 this.generateAndSaveKeyPair(context)
             }
         }
+
+        fun deletePrivatKey(context: Context) = deleteKeyPair(getFile(context))
 
         private fun deleteKeyPair(file: File) = file.apply { if (this.exists()) this.delete() }
 

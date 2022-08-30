@@ -28,6 +28,12 @@ enum class BLEIntError: ErrorDescription {
         override val description: String
             get() = ClientError.INVALID_SESSION.description
     },
+    INVALID_COMMAND {
+        override val code: String
+            get() = "invalid_command"
+        override val description: String
+            get() = ClientError.INVALID_COMMAND.description
+    },
     NOT_CONNECTED {
         override val code: String
             get() = "not_connected"
@@ -61,6 +67,7 @@ enum class BLEIntError: ErrorDescription {
                 ClientError.INVALID_DATA.name -> INVALID_DATA
                 ClientError.INVALID_STATE.name -> INVALID_STATE
                 ClientError.INVALID_SESSION.name -> INVALID_SESSION
+                ClientError.INVALID_COMMAND.name -> INVALID_COMMAND
                 BluetoothError.NOT_CONNECTED.name -> NOT_CONNECTED
                 BluetoothError.TIMEOUT_ERROR.name -> TIMEOUT
                 BluetoothError.PERIPHERAL_NOT_FOUND.name -> PERIPHERAL_NOT_FOUND

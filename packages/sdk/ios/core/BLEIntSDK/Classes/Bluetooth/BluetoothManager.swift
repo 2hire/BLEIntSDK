@@ -17,7 +17,7 @@ internal class BluetoothManager: NSObject {
     var connectableState: WritableTLState = .Unknown {
         didSet {
             if oldValue != self.connectableState {
-                Self.logger.info(
+                Self.logger.debug(
                     "Status changed (\(oldValue.description) -> \(self.connectableState.description))",
                     metadata: .bluetooth
                 )
@@ -95,7 +95,7 @@ extension BluetoothManager: WritableTL {
         writeCharacteristic characteristic: CBCharacteristic
     ) {
         if self.writeBuffer.isEmpty {
-            Self.logger.info(
+            Self.logger.debug(
                 "Write buffer empty, current status \(self.connectableState.description), resetting to previous status \(self.senderConnectableState.description)",
                 metadata: .bluetooth
             )
@@ -217,7 +217,7 @@ extension BluetoothManager {
             metadata: .bluetooth
         )
 
-        Self.logger.info(
+        Self.logger.debug(
             "Setting read notifications value (\(value.description)) to characteristic \(peripheral.identifier.uuidString):",
             metadata: .bluetooth
         )
@@ -240,7 +240,7 @@ extension BluetoothManager {
         }
 
         if characteristic.uuid.uuidString == BluetoothConstants.ReadCharacteristic {
-            Self.logger.info(
+            Self.logger.debug(
                 "Notification state updated to \(characteristic.isNotifying.description) for characteristic \( characteristic.uuid.uuidString)",
                 metadata: .bluetooth
             )

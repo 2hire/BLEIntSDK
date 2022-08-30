@@ -9,7 +9,7 @@ export interface BLEIntSdk {
   endSession: () => Promise<CommandResponse>;
 }
 
-export type CommandType = "start" | "stop" | "noop" | "end_session";
+export type CommandType = "start" | "stop" | "end_session";
 
 export type Commands = Record<CommandType, string>;
 
@@ -22,6 +22,7 @@ export type ErrorCode =
   | "invalid_data"
   | "invalid_state"
   | "invalid_session"
+  | "invalid_command"
   | "not_connected"
   | "timeout"
   | "peripheral_not_found"

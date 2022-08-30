@@ -51,7 +51,7 @@ class ReactNativeBleintSdk: NSObject {
             do {
                 let response = try await Self.client.connectToVehicle(withIdentifier: address)
 
-                resolve(response.asDictionary)
+                resolve(response?.asDictionary ?? NSNull())
             }
             catch let error as BLEIntSDKError {
                 reject(

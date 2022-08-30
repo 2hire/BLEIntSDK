@@ -1,8 +1,37 @@
 
 
-### [0.0.6](https://github.com/2hire/BLEIntSDK/compare/v0.0.4...v0.0.5) (2022-08-08)
+## [0.1.0](https://github.com/2hire/BLEIntSDK/compare/v0.0.5...v0.0.6) (2022-08-30)
 
-### [0.0.5](https://github.com/2hire/BLEIntSDK/compare/v0.0.4...v0.0.5) (2022-08-02)
+### [0.0.6](https://github.com/2hire/BLEIntSDK/compare/v0.0.5...v0.0.6) (2022-08-08)
+
+## [0.1.0](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.6...v0.1.0) (2022-08-30)
+
+
+### Features
+
+* **android:** add commands responses ([f87401b](https://github.com/2hire/BLEIntSDK-private/commit/f87401b6ba303c9d6dec08d2e1682cf40aa2e395))
+* **android:** delete private key after end session ([a2ca78c](https://github.com/2hire/BLEIntSDK-private/commit/a2ca78c4a79f57d7130e3ee47d975610b99d148b))
+* **ios:** add commands responses ([53a8d04](https://github.com/2hire/BLEIntSDK-private/commit/53a8d04d3bd552a18621103b136556701d065d27))
+* **ios:** add crc-32 utility ([d8540ed](https://github.com/2hire/BLEIntSDK-private/commit/d8540ed9558ef5966e89b98db861f7c7d28b9909))
+* **ios:** add ProtocolValue enum protocol ([d0db6cd](https://github.com/2hire/BLEIntSDK-private/commit/d0db6cd602eff827ff57454ff501c84b435629ce))
+* **ios:** add sync command ([6b8ad97](https://github.com/2hire/BLEIntSDK-private/commit/6b8ad97388298ab2e4a18363ed073980e5379a50))
+* **ios:** delete private key after end session ([4c6e240](https://github.com/2hire/BLEIntSDK-private/commit/4c6e240129b2b25ed27f260590b1b1224d10e106))
+* **ios:** packet encoding and decoding ([bdde15b](https://github.com/2hire/BLEIntSDK-private/commit/bdde15bb2c9337e17b08862ef01d01090100c04e))
+* **ios:** set private key max age ([5a12cf2](https://github.com/2hire/BLEIntSDK-private/commit/5a12cf2d0512b73f7bb4d04461c947ca9ae3cfae))
+* **types:** add `invalid_command` to errors ([dbe8ded](https://github.com/2hire/BLEIntSDK-private/commit/dbe8ded3510e8bb51edfcb7b9d683077cb27ab28))
+
+
+### Bug Fixes
+
+* **android:** bluetooth packet data merger ([c31220b](https://github.com/2hire/BLEIntSDK-private/commit/c31220b811d18e4bbcb981a7929fed1c0a6b86fa))
+* **android:** data merger closing frame ([7f59dc8](https://github.com/2hire/BLEIntSDK-private/commit/7f59dc83b352ff7df37dd168740b554dbc120b1f))
+* **android:** protocol manager set public key ([ba5a261](https://github.com/2hire/BLEIntSDK-private/commit/ba5a2613b7a2bda7e87a78bce5e25a496bf5d422))
+* **android:** serialization private key to keystore ([72e417f](https://github.com/2hire/BLEIntSDK-private/commit/72e417fc897f1d411d8336e315df90a7cffbf348))
+* **cordova:** handle null `connectToVehicle` response ([cd6c2de](https://github.com/2hire/BLEIntSDK-private/commit/cd6c2de00f2762d70885b5ba2493117fffd7941f))
+* **ios:** error while deleting item not found in keychain ([f420f98](https://github.com/2hire/BLEIntSDK-private/commit/f420f98dcbc09e86852baaac022a8f1f9ebd7489))
+* **ios:** set debug logLevel ([f755478](https://github.com/2hire/BLEIntSDK-private/commit/f7554784db4c5f357b631a6d0c3133a6a0f46a8a))
+* **rn-android:** handle null session response ([19c4415](https://github.com/2hire/BLEIntSDK-private/commit/19c44152b31858c67ac2479451bbec5750216d37))
+* **rn-ios:** handle nil command response ([156497a](https://github.com/2hire/BLEIntSDK-private/commit/156497a3b6b344a86f8e25d65747a8f5f5fe6490))
 
 ### [0.0.6](https://github.com/2hire/BLEIntSDK-private/compare/v0.0.5...v0.0.6) (2022-08-08)
 

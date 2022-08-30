@@ -120,33 +120,44 @@ internal class BluetoothLeService : Service(), WritableTL {
         val dataMerger = this.dataMerger ?: throw IllegalStateException(BluetoothError.GENERIC.name)
 
         manager.apply {
-            this.enableIndicationsRequest()
-                .before {
-                    Log.d(tag, "Starting enable indications request")
-                    this@BluetoothLeService.state = WritableTLState.Reading
-                }
-                .fail { _, status ->
-                    this.waitUntilDisconnection {
-                        Log.e(
-                            tag,
-                            "Found error while reading new indications state $status"
-                        )
+            var startingReadCharacteristicValue: ByteArray? = null
 
-                        this@BluetoothLeService.state = WritableTLState.Errored
+            this.getRequestQueue()
+                .add(
+                    this.enableIndicationsRequest()
+                        .before {
+                            Log.d(tag, "Starting enable indications request")
+                            this@BluetoothLeService.state = WritableTLState.Reading
+                        }
+                        .fail { _, status ->
+                            this.waitUntilDisconnection {
+                                Log.e(
+                                    tag,
+                                    "Found error while reading new indications state $status"
+                                )
 
-                        broadcastUpdate(
-                            Intent(BluetoothAction.ACTION_READ_ERROR).putExtra(
-                                BluetoothAction.ACTION_EXTRA_DATA,
-                                status
-                            )
-                        )
-                    }
-                }
-                .done {
-                    Log.d(tag, "Done writing enable indications request")
+                                this@BluetoothLeService.state = WritableTLState.Errored
 
+                                broadcastUpdate(
+                                    Intent(BluetoothAction.ACTION_READ_ERROR).putExtra(
+                                        BluetoothAction.ACTION_EXTRA_DATA,
+                                        status
+                                    )
+                                )
+                            }
+                        }
+                        .done {
+                            Log.d(tag, "Done writing enable indications request")
+                        })
+                .add(
                     this.readIndicationRequest()
-                        .before { Log.d(tag, "Starting read request") }
+                        .before { Log.d(tag, "Starting read request")
+
+                            this.getReadCharacteristicValue()?.let {
+                                Log.d(tag, "Read characteristic value: ${it.toHex()}")
+                                startingReadCharacteristicValue = it
+                            }
+                        }
                         .merge(
                             dataMerger
                         ) { _, chunk, _ -> Log.d(tag, "received chunk [${chunk?.toHex()}]") }
@@ -157,10 +168,16 @@ internal class BluetoothLeService : Service(), WritableTL {
                                 Log.d(tag, "Received data is empty!")
                             }
 
+                            var value = data.value?.let {
+                                startingReadCharacteristicValue?.let { bytes ->
+                                    return@let bytes + it
+                                } ?: it
+                            }
+
                             broadcastUpdate(
                                 Intent(BluetoothAction.ACTION_READ_DATA).putExtra(
                                     BluetoothAction.ACTION_EXTRA_DATA,
-                                    data.value
+                                    value
                                 )
                             )
                         }.fail { _, status ->
@@ -182,8 +199,8 @@ internal class BluetoothLeService : Service(), WritableTL {
                         .timeout(BluetoothConstants.READ_TIMEOUT)
                         .done {
                             Log.d(tag, "Done reading value")
-                        }.enqueue()
-                }.enqueue()
+                        })
+                .enqueue()
         }
     }
 
@@ -410,6 +427,10 @@ internal class BluetoothLeService : Service(), WritableTL {
                     .done { callback() }.enqueue()
             }
         }
+
+        fun getReadCharacteristicValue() = this.readCharacteristic?.value
+
+        fun getRequestQueue() = this.beginAtomicRequestQueue()
 
         override fun getGattCallback() = GattCallback()
 

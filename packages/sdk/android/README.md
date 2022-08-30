@@ -92,7 +92,6 @@ val publicKey = "public_key"
 val commands: Commands = mapOf(
     CommandType.Start to "start_command_payload",
     CommandType.Stop to "start_command_payload",
-    CommandType.Noop to "noop_command_payload",
     CommandType.EndSession to "end_session_command_payload"
 )
 

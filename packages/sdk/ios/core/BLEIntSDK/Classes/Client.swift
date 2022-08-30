@@ -8,14 +8,13 @@ import Foundation
 import Logging
 import os.log
 
-public typealias CommandResponse = ProtocolResponse
+public typealias CommandResponse = ProtocolCommandResponse
 
 public class Client {
     private var personalPrivateKey: PrivateKey?
     private var sessionData: SessionData?
 
     private var manager: ProtocolManager?
-    private var writableStateHistory: [WritableTLState] = []
 
     private var identifier: String?
 
@@ -28,7 +27,8 @@ public class Client {
             Logger.Metadata.requestId = UUID().uuidString
 
             Self.logger.info("Getting PrivateKey from KeyChain", metadata: .client)
-            let privateKey = try KeychainHelper.getOrGeneratePrivateKey()
+
+            let privateKey = try KeychainHelper.getOrGeneratePrivateKey(with: 86_400)
             let publicKey = try CryptoHelper.wrapPublicKey(from: data.publicKey.rawFromBase64Encoded)
 
             self.sessionData = data
@@ -37,18 +37,15 @@ public class Client {
             self.manager = ProtocolManager.init(
                 with: BluetoothManager.shared,
                 privateKey: privateKey,
-                publicKey: publicKey,
-                delegate: self
+                publicKey: publicKey
             )
-
-            self.writableStateHistory = []
         }
         catch {
             throw try Self.logAndMapError(error)
         }
     }
 
-    public func connectToVehicle(withIdentifier macAddress: String) async throws -> CommandResponse {
+    public func connectToVehicle(withIdentifier macAddress: String) async throws -> CommandResponse? {
         return try await Self.catchInternalError {
             guard let manager = self.manager
             else {
@@ -62,60 +59,33 @@ public class Client {
                 throw ClientError.InvalidState
             }
 
-            guard let command = sessionData.commands[.Noop]
-            else {
-                Self.logger.error("Error while connecting to vehicle, noop command is nil", metadata: .client)
-                throw ClientError.InvalidState
-            }
+            Self.logger.info("Connecting to vehicle with identifier: \(macAddress)")
 
             self.identifier = macAddress
-            var invalidSessionNoop = false
-
             try await self._connect()
 
             do {
-                Self.logger.info("Sending Noop command to retrieve connection status", metadata: .client)
-                guard
-                    let noopResponse =
-                        try? await manager.sendCommand(withPayload: command.rawFromBase64Encoded)
-                else {
-                    Self.logger.info("Noop failed, reconnecting", metadata: .client)
+                let privateKey = try KeychainHelper.getOrGeneratePrivateKey()
+                manager.setPrivateKey(privateKey)
 
-                    if ClientError.checkInvalidSession(for: writableStateHistory) {
-                        Self.logger.info("Noop failed for an InvalidSession", metadata: .client)
-                        invalidSessionNoop = true
-                    }
-
-                    try await manager.connect(to: macAddress)
-
-                    Self.logger.info("Generating a new PrivateKey", metadata: .client)
-                    let privateKey = try KeychainHelper.generateAndSavePrivateKey()
-                    manager.setPrivateKey(privateKey)
-
-                    Self.logger.info("Starting a new session", metadata: .client)
-
-                    let response = try await manager.startSession(
+                do {
+                    return try await manager.startSession(
                         withAccess: sessionData.accessToken.rawFromBase64Encoded
-                    )
-
-                    Self.logger.info("Start session response: \"\(response.description)\"")
-
-                    return response
+                    ).get()
                 }
+                catch ProtocolErrorCode.AlreadyValidated {
+                    Self.logger.info("Session is still valid", metadata: .client)
 
-                return noopResponse
+                    return nil
+                }
+                catch let error as ProtocolErrorCode {
+                    Self.logger.error("Received protocol error code \(error.rawValue)", metadata: .client)
+                    throw ClientError.InvalidSession(errorCode: "\(error.rawValue)")
+                }
             }
             catch {
-                if invalidSessionNoop && ClientError.checkInvalidSession(for: writableStateHistory) {
-                    Self.logger.info(
-                        "ConnectToVehicle failed with two consecutive InvalidSession errors",
-                        metadata: .client
-                    )
-
-                    throw ClientError.InvalidSession
-                }
-
-                Self.logger.info("ConnectToVehicle failed with \(error.localizedDescription)", metadata: .client)
+                Self.logger.error("Error while creating session, removing PrivateKey", metadata: .client)
+                try KeychainHelper.deletePrivateKey()
 
                 throw error
             }
@@ -124,21 +94,31 @@ public class Client {
 
     public func sendCommand(type: CommandType) async throws -> CommandResponse {
         return try await Self.catchInternalError {
-            Self.logger.info("Preparing to send command: \(type.rawValue)", metadata: .client)
-
             return try await self._sendCommand(type: type)
         }
     }
 
     public func endSession() async throws -> CommandResponse {
         return try await Self.catchInternalError {
+            defer {
+                do {
+                    Self.logger.info("Session was closed, removing PrivateKey", metadata: .client)
+                    try KeychainHelper.deletePrivateKey()
+                }
+                catch {
+                    Self.logger.error(
+                        "Error while removing PrivateKey: \(error.localizedDescription)",
+                        metadata: .client
+                    )
+                }
+            }
+
             let data = try await self._sendCommand(type: .EndSession)
 
             self.personalPrivateKey = nil
             self.sessionData = nil
             self.manager = nil
             self.identifier = nil
-            self.writableStateHistory = []
 
             return data
         }
@@ -171,6 +151,8 @@ public class Client {
     private func _sendCommand(type: CommandType) async throws
         -> CommandResponse
     {
+        Self.logger.info("Sending command: \(type.rawValue)", metadata: .client)
+
         guard let manager = self.manager
         else {
             Self.logger.error("Error while connecting to vehicle, manager is nil", metadata: .client)
@@ -197,13 +179,16 @@ public class Client {
             Self.logger.info("Vehicle is already connected, skipping", metadata: .client)
         }
 
-        Self.logger.info("Sending command: \(type.rawValue)", metadata: .client)
+        do {
+            let response = try await manager.sendCommand(withPayload: command.rawFromBase64Encoded).get()
+            Self.logger.info("Command response: \"\(response.description)\"", metadata: .client)
 
-        let response = try await manager.sendCommand(withPayload: command.rawFromBase64Encoded)
-
-        Self.logger.info("Command response: \"\(response.description)\"", metadata: .client)
-
-        return response
+            return response
+        }
+        catch let error as ProtocolErrorCode {
+            Self.logger.error("Received protocol error code \(error.rawValue)", metadata: .client)
+            throw ClientError.InvalidCommand(errorCode: "\(error.rawValue)")
+        }
     }
 
     private static func catchInternalError<T>(throwingCallback: () async throws -> T) async throws -> T {
@@ -223,12 +208,6 @@ public class Client {
         )
 
         return internalError
-    }
-}
-
-extension Client: ProtocolManagerDelegate {
-    func state(didChange state: WritableTLState) {
-        self.writableStateHistory.append(state)
     }
 }
 

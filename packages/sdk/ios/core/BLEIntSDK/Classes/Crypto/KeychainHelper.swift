@@ -61,8 +61,8 @@ internal class KeychainHelper {
             let updateStatus = SecItemUpdate(updateQuery, attributeToUpdate)
 
             guard updateStatus == errSecSuccess else {
-                Self.logger.info(
-                    "Error while updating PrivateKey in keychain already",
+                Self.logger.error(
+                    "Error while updating PrivateKey (\(updateStatus))",
                     metadata: .keychain
                 )
                 throw KeyChainHelperError.GenericError
@@ -72,6 +72,10 @@ internal class KeychainHelper {
         }
 
         guard saveStatus == errSecSuccess else {
+            Self.logger.error(
+                "Error while saving PrivateKey (\(saveStatus))",
+                metadata: .keychain
+            )
             throw KeyChainHelperError.GenericError
         }
     }
@@ -98,6 +102,9 @@ internal class KeychainHelper {
             if status == errSecItemNotFound {
                 Self.logger.info("PrivateKey not found in keychain", metadata: .keychain)
                 throw KeyChainHelperError.PrivateKeyNotFoundError
+            }
+            else {
+                Self.logger.error("Error while getting PrivateKey (\(status))", metadata: .keychain)
             }
 
             throw KeyChainHelperError.GenericError
@@ -127,6 +134,12 @@ internal class KeychainHelper {
         let status = SecItemDelete(query)
 
         guard status == errSecSuccess else {
+            if status == errSecItemNotFound {
+                Self.logger.info("PrivateKey not found in keychain", metadata: .keychain)
+                return
+            }
+
+            Self.logger.error("Error while deleting PrivateKey (\(status))", metadata: .keychain)
             throw KeyChainHelperError.GenericError
         }
 
@@ -149,14 +162,14 @@ internal class KeychainHelper {
             let result = try Self.getPrivateKeyFromKeychain()
 
             if let keyAge = maxAge {
-                let now = Date()
+                let now = Date().timeIntervalSince1970
 
                 Self.logger.debug(
-                    "Key was created at \(Date(timeIntervalSince1970: result.timestamp).description) (now: \(now.description)) with maxAge of \(keyAge.description)",
+                    "Key was created at \(result.timestamp) (now: \(now)) with maxAge of \(keyAge)",
                     metadata: .keychain
                 )
 
-                if result.timestamp + keyAge < now.timeIntervalSince1970 {
+                if result.timestamp + keyAge < now {
                     Self.logger.info("Key has expired, generating a new one", metadata: .keychain)
 
                     return try Self.generateAndSavePrivateKey()

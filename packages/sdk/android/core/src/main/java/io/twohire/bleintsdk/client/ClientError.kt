@@ -15,48 +15,9 @@ enum class ClientError : ErrorDescription {
     INVALID_SESSION {
         override val description: String
             get() = "Client invalid session"
+    },
+    INVALID_COMMAND {
+        override val description: String
+            get() = "Client invalid command"
     };
-}
-
-private val InvalidSessionStateFlow = listOf(
-    listOf(
-        WritableTLState.Writing,
-        WritableTLState.Connected,
-        WritableTLState.Reading,
-        WritableTLState.Errored
-    ),
-    listOf(
-        WritableTLState.Reading,
-        WritableTLState.Errored,
-        WritableTLState.Unknown
-    ),
-    listOf(
-        WritableTLState.Connected,
-        WritableTLState.Reading,
-        WritableTLState.Unknown,
-        WritableTLState.Errored
-    )
-)
-
-internal fun checkInvalidSession(states: List<WritableTLState>): Boolean {
-    for (it in InvalidSessionStateFlow.listIterator()) {
-        val last = states.takeLast(it.size)
-
-        if (last.size == it.size) {
-            var match = true
-
-            for (item in last.withIndex()) {
-                if (it[item.index].ordinal != item.value.ordinal) {
-                    match = false
-                    break
-                }
-            }
-
-            if (match) {
-                return true
-            }
-        }
-    }
-
-    return false
 }

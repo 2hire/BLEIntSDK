@@ -7,9 +7,7 @@ import io.twohire.bleintsdk.bluetooth.BluetoothAction
 import io.twohire.bleintsdk.bluetooth.BluetoothLeService
 import io.twohire.bleintsdk.crypto.CryptoHelper
 import io.twohire.bleintsdk.crypto.ECKeyPair
-import io.twohire.bleintsdk.crypto.SealedBox
 import io.twohire.bleintsdk.utils.toHex
-import org.spongycastle.jce.interfaces.ECPrivateKey
 import org.spongycastle.jce.interfaces.ECPublicKey
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -18,14 +16,21 @@ import kotlin.coroutines.suspendCoroutine
 
 internal class ProtocolManager private constructor(
     private var keyPair: ECKeyPair,
-    private val publicKey: ECPublicKey,
-    private val delegate: ProtocolManagerDelegate
-): ProtocolManagerDelegate by delegate {
+    private var publicKey: ECPublicKey
+) {
     private val tag = "${ProtocolManager::class.simpleName}@${System.identityHashCode(this)}"
 
     private var bluetoothLeService: BluetoothLeService? = null
     private var bluetoothLeServiceConn: BluetoothLeServiceConnection? = null
     var writableState: WritableTLState? = null
+
+    fun setKeyPair(keyPair: ECKeyPair) {
+        this.keyPair = keyPair
+    }
+
+    protected fun setPublicKey(keyPair: ECPublicKey) {
+        this.publicKey = keyPair
+    }
 
     private inner class BluetoothLeServiceConnection : ServiceConnection {
         override fun onServiceConnected(componentName: ComponentName?, binder: IBinder?) {
@@ -65,7 +70,6 @@ internal class ProtocolManager private constructor(
                                 "Did change state: ${this@ProtocolManager.writableState?.name} -> ${state.name}"
                             )
                             this@ProtocolManager.writableState = state
-                            this@ProtocolManager.delegate.didChangeState(state)
                         }
                     }
                 }
@@ -101,7 +105,6 @@ internal class ProtocolManager private constructor(
 
                         this@ProtocolManager.writeContinuation?.resumeWithException(error)
                             .also { this@ProtocolManager.writeContinuation = null }
-
                     }
                 }
                 BluetoothAction.ACTION_WRITE_ERROR -> {
@@ -159,17 +162,42 @@ internal class ProtocolManager private constructor(
                 }
                 BluetoothAction.ACTION_READ_COMPLETE -> {
                     try {
-                        val decryptedData = decryptCommand(
-                            this@ProtocolManager.readBuffer,
-                            this@ProtocolManager.keyPair.privateKey,
-                            this@ProtocolManager.publicKey
+                        Log.d(tag, "Stop read data: ${readBuffer.toHex()}")
+
+                        val payload = arrayOf(
+                            ProtocolFrame.SESSION_START.rawValue,
+                            ProtocolFrame.COMMAND_START.rawValue
+                        ).firstNotNullOf {
+                            val firstMatch = readBuffer.slice(it.indices).toByteArray()
+                            val secondMatch =
+                                readBuffer.slice(it.indices.last + 1 until it.indices.last + 1 + it.size)
+                                    .toByteArray()
+
+                            if (secondMatch.contentEquals(it)) {
+                                return@firstNotNullOf readBuffer.drop(it.size * 2).toByteArray()
+                            } else if (firstMatch.contentEquals(it)) {
+                                return@firstNotNullOf readBuffer.drop(it.size).toByteArray()
+                            }
+
+                            null
+                        }.dropLast(4).toByteArray()
+
+                        this@ProtocolManager.processCommandResponse(
+                            EncryptedCommandPacket.create(
+                                payload
+                            )
                         )
 
-                        Log.d(tag, "Decrypted data ${decryptedData.toHex()}")
+                    } catch (error: NoSuchElementException) {
+                        Log.e(tag, "Start frame not found")
 
-                        this@ProtocolManager.processCommandResponse(decryptedData)
+                        this@ProtocolManager.writeContinuation?.resumeWithException(
+                            IllegalStateException(ProtocolError.INVALID_DATA.name)
+                        )
+                            .also { this@ProtocolManager.writeContinuation = null }
                     } catch (error: Exception) {
-                        Log.e(tag, "Error while stop reading")
+                        Log.e(tag, "Error while stop reading (${error.message})")
+
                         this@ProtocolManager.writeContinuation?.resumeWithException(error)
                             .also { this@ProtocolManager.writeContinuation = null }
                     }
@@ -179,7 +207,7 @@ internal class ProtocolManager private constructor(
     }
 
     private var connectionContinuation: Continuation<Boolean>? = null
-    private var writeContinuation: Continuation<ProtocolResponse>? = null
+    private var writeContinuation: Continuation<Result<ProtocolResponse>>? = null
 
     private var writeBuffer = arrayOf(ByteArray(0))
     private var readBuffer = ByteArray(0)
@@ -187,9 +215,8 @@ internal class ProtocolManager private constructor(
     private constructor(
         context: Context,
         keyPair: ECKeyPair,
-        publicKey: ECPublicKey,
-        callback: ProtocolManagerDelegate
-    ) : this(keyPair, publicKey, callback) {
+        publicKey: ECPublicKey
+    ) : this(keyPair, publicKey) {
 
         val connection = BluetoothLeServiceConnection()
         val status =
@@ -236,98 +263,91 @@ internal class ProtocolManager private constructor(
         }
     }
 
-    suspend fun startSession(accessData: ByteArray) = suspendCoroutine<ProtocolResponse> { cont ->
-        if (this@ProtocolManager.writeContinuation !== null) {
-            cont.resumeWithException(IllegalStateException(ProtocolError.API_MISUSE.name))
-        } else {
-            try {
-                this@ProtocolManager.writeContinuation = cont
-                val personalPublicKey =
-                    CryptoHelper.compactPublicKey(this@ProtocolManager.keyPair.publicKey)
+    suspend fun startSession(accessData: ByteArray) = withThrowingWriteContinuation { ->
+        val personalPublicKey =
+            CryptoHelper.compactPublicKey(this@ProtocolManager.keyPair.publicKey)
 
-                this@ProtocolManager.writeBuffer = arrayOf(
-                    ProtocolConstants.START_SEQUENCE,
-                    personalPublicKey + accessData,
-                    ProtocolConstants.END_SEQUENCE
-                )
+        this@ProtocolManager.writeBuffer = arrayOf(
+            ProtocolFrame.SESSION_START.rawValue,
+            personalPublicKey + accessData,
+            ProtocolFrame.SESSION_END.rawValue,
+        )
 
-                Log.d(
-                    tag,
-                    "Start session data ${
-                        writeBuffer.map { it.contentToString() }.toTypedArray().contentToString()
-                    }"
-                )
+        Log.d(
+            tag,
+            "Start session data ${
+                writeBuffer.map { it.contentToString() }.toTypedArray().contentToString()
+            }"
+        )
 
-                this@ProtocolManager.write()
-            } catch (error: Exception) {
-                cont.resumeWithException(error)
-                this@ProtocolManager.writeContinuation = null
-            }
-        }
+        this@ProtocolManager.write()
     }
 
-    suspend fun sendCommand(payload: ByteArray) = suspendCoroutine<ProtocolResponse> { cont ->
-        if (this@ProtocolManager.writeContinuation !== null) {
-            cont.resumeWithException(IllegalStateException(ProtocolError.API_MISUSE.name))
-        } else {
-            try {
-                this@ProtocolManager.writeContinuation = cont
-                val commandPayload = createCommand(payload, keyPair.privateKey, publicKey)
+    suspend fun sendCommand(payload: ByteArray) = withThrowingWriteContinuation {
+        try {
+            val commandPayload = CommandRequestPayload(payload).encode()
 
-                this@ProtocolManager.writeBuffer = arrayOf(
-                    ProtocolConstants.START_SEQUENCE,
-                    commandPayload,
-                    ProtocolConstants.END_SEQUENCE
-                )
-                Log.d(
-                    tag,
-                    "Sending command data: ${
-                        writeBuffer.map { it.contentToString() }.toTypedArray().contentToString()
-                    }"
-                )
+            val encryptedPacket = EncryptedCommandPacket.encrypt(
+                commandPayload,
+                PROTOCOL_VERSION,
+                keyPair.privateKey,
+                publicKey
+            ).encode()
 
-                this@ProtocolManager.write()
-            } catch (error: Exception) {
-                cont.resumeWithException(error)
-                this@ProtocolManager.writeContinuation = null
-            }
+            this@ProtocolManager.writeBuffer = arrayOf(
+                ProtocolFrame.COMMAND_START.rawValue,
+                encryptedPacket,
+                ProtocolFrame.COMMAND_END.rawValue
+            )
+        } catch (exception: Exception) {
+            Log.e(tag, "Error while encrypting command data: ${exception.message}")
+            throw IllegalStateException(ProtocolError.CRYPTO.name)
         }
+
+        Log.d(
+            tag,
+            "Sending command data: ${
+                writeBuffer.map { it.contentToString() }.toTypedArray().contentToString()
+            }"
+        )
+
+        this@ProtocolManager.write()
     }
 
-    private fun processCommandResponse(payload: ByteArray) =
+    private fun processCommandResponse(packet: EncryptedCommandPacket) =
         this@ProtocolManager.writeContinuation?.let {
-            val validity = payload[5]
-            val additionalPayload = payload.drop(6).toByteArray()
+            Log.d(
+                tag,
+                "Received encrypted command response: ${packet.data.toHex()}"
+            )
 
-            when (validity) {
-                ProtocolConstants.ACK -> {
-                    it.resumeWith(
-                        Result.success(
-                            ProtocolResponse(
-                                true, additionalPayload
-                            )
+            val decryptedData = packet.decrypt(
+                this@ProtocolManager.keyPair.privateKey,
+                this@ProtocolManager.publicKey
+            )
+            Log.d(
+                tag,
+                "Decrypted command data: ${decryptedData.toHex()}"
+            )
+
+            val commandPayload = CommandResponsePayload.create(decryptedData)
+
+            if (commandPayload.commandIdentifier != CommandIdentifier.ERROR) {
+                it.resume(
+                    Result.success(
+                        ProtocolResponse(
+                            commandPayload.commandIdentifier == CommandIdentifier.ACK,
+                            commandPayload.data
                         )
                     )
-                }
-                ProtocolConstants.NACK -> {
-                    it.resumeWith(
-                        Result.success(
-                            ProtocolResponse(
-                                false, additionalPayload
-                            )
-                        )
-                    )
-                }
-                else -> {
-                    it.resumeWithException(
-                        IllegalStateException(ProtocolError.GENERIC.name)
-                    )
-                }
+                )
+            } else {
+                val errorPayload = ErrorCommandPayload.create(commandPayload.data)
+                it.resume(Result.failure(ProtocolErrorCodeException(errorPayload.errorCode)))
             }
         }.also {
             this@ProtocolManager.writeContinuation = null
         }
-
 
     private fun write() {
         try {
@@ -353,9 +373,21 @@ internal class ProtocolManager private constructor(
         }
     }
 
-    fun setKeyPair(keyPair: ECKeyPair) {
-        this.keyPair = keyPair
-    }
+    private suspend fun withThrowingWriteContinuation(body: () -> Unit) =
+        suspendCoroutine<Result<ProtocolResponse>> { cont ->
+            if (this@ProtocolManager.writeContinuation !== null) {
+                cont.resumeWithException(IllegalStateException(ProtocolError.API_MISUSE.name))
+            }
+
+            try {
+                this@ProtocolManager.writeContinuation = cont
+
+                body()
+            } catch (exception: Exception) {
+                cont.resumeWithException(exception)
+                this@ProtocolManager.writeContinuation = null
+            }
+        }
 
     companion object {
         private val TAG = "${ProtocolManager::class.simpleName}"
@@ -365,75 +397,21 @@ internal class ProtocolManager private constructor(
         fun getInstance(
             context: Context,
             keyPair: ECKeyPair,
-            publicKey: ECPublicKey,
-            callback: ProtocolManagerDelegate
-        ): ProtocolManager {
-            if (this.instance == null) {
-                this.instance = ProtocolManager(context, keyPair, publicKey, callback)
-            }
-
-            return this.instance!!
-        }
-
-        private fun createCommand(
-            payload: ByteArray,
-            privateKey: ECPrivateKey,
             publicKey: ECPublicKey
-        ): ByteArray {
-            var dataToEncrypt = byteArrayOf(ProtocolMessageType.REQUEST)
+        ): ProtocolManager {
+            var instance = this.instance
 
-            dataToEncrypt += getTimestamp()
-            dataToEncrypt += payload
-
-            Log.d(TAG, "Data to Encrypt: ${dataToEncrypt.contentToString()}")
-
-            try {
-                val sealedBox = CryptoHelper.encrypt(dataToEncrypt, privateKey, publicKey)
-
-                return byteArrayOf(PROTOCOL_VERSION) + sealedBox.nonce + sealedBox.tag + sealedBox.data
-            } catch (error: Exception) {
-                Log.e(TAG, "Error while encrypting command data: ${error.message}")
-
-                throw IllegalStateException(ProtocolError.CRYPTO.name)
+            if (instance == null) {
+                instance = ProtocolManager(context, keyPair, publicKey)
+                this.instance = instance
+            } else {
+                instance.setKeyPair(keyPair)
+                instance.setPublicKey(publicKey)
             }
+
+            return instance
         }
-
-        private fun decryptCommand(
-            data: ByteArray,
-            privateKey: ECPrivateKey,
-            publicKey: ECPublicKey,
-        ): ByteArray {
-            val nonce = data.sliceArray(1 until 17)
-            val tag = data.sliceArray(17 until 33)
-            val encryptedPayload = data.drop(33).toByteArray()
-
-            Log.d(TAG, "Buffer length ${data.size}")
-            Log.d(TAG, "Nonce(${nonce.size}): ${nonce.contentToString()}")
-            Log.d(TAG, "Tag(${tag.size}): ${tag.contentToString()}")
-            Log.d(
-                TAG,
-                "EncryptedPayload(${encryptedPayload.size}): ${encryptedPayload.contentToString()}"
-            )
-
-            return CryptoHelper.decrypt(
-                SealedBox(encryptedPayload, nonce, tag),
-                privateKey,
-                publicKey
-            )
-        }
-
-        private fun getTimestamp() =
-            (System.currentTimeMillis() / 1000).toInt().run {
-                byteArrayOf(
-                    this.toByte(),
-                    (this ushr 8).toByte(),
-                    (this ushr 16).toByte(),
-                    (this ushr 24).toByte()
-                )
-            }
     }
 }
 
-internal interface ProtocolManagerDelegate {
-    fun didChangeState(state: WritableTLState)
-}
+internal class ProtocolErrorCodeException(val errorCode: ProtocolErrorCode) : Throwable()

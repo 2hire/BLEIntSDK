@@ -11,7 +11,7 @@ afterEvaluate {
             maven(MavenPublication) {
                 groupId = 'io.twohire'
                 artifactId = 'bleintsdk'
-                version = '0.0.6'
+                version = '0.1.0'
 
                 afterEvaluate {
                     from components.release

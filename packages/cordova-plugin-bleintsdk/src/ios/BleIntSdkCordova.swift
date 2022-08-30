@@ -69,7 +69,7 @@ class BLEIntSDKCordova: CDVPlugin {
                 self.commandDelegate.send(
                     CDVPluginResult(
                         status: CDVCommandStatus_OK,
-                        messageAs: response.asDictionary
+                        messageAs: response?.asDictionary
                     ),
                     callbackId: command.callbackId
                 )

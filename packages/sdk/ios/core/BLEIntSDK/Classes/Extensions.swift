@@ -31,6 +31,18 @@ extension Date {
     }
 }
 
+extension Array where Element == UInt8 {
+    static func from(value: UInt32) -> [UInt8] {
+        var array: [UInt8] = []
+
+        Swift.withUnsafeBytes(of: value.littleEndian) {
+            array.append(contentsOf: $0)
+        }
+
+        return array
+    }
+}
+
 extension WritableTLState {
     var description: String {
         switch self {

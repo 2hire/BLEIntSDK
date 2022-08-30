@@ -4,12 +4,18 @@
 //  Copyright © 2022 2hire.io. All rights reserved.
 //
 
+import CryptoKit
 import Foundation
 import K1
 import Logging
 import os.log
 
-public struct ProtocolResponse {
+public struct ProtocolCommandResponse {
+    internal init(success: Bool, additionalPayload: [UInt8]) {
+        self.success = success
+        self.additionalPayload = additionalPayload
+    }
+
     public let success: Bool
     public let additionalPayload: [UInt8]
 
@@ -18,43 +24,30 @@ public struct ProtocolResponse {
     }
 }
 
+internal typealias ProtocolResult = Result<ProtocolCommandResponse, ProtocolErrorCode>
+
 internal class ProtocolManager {
     private var privateKey: PrivateKey!
     private var publicKey: PublicKey!
 
     private var writable: WritableTL!
-    private(set) var writableState: WritableTLState? {
-        didSet {
-            if let state = self.writableState {
-                self.delegate?.state(didChange: state)
-            }
-        }
-    }
-
-    private var delegate: ProtocolManagerDelegate?
+    private(set) var writableState: WritableTLState?
 
     private var writeBuffer: [[UInt8]] = []
     private var readBuffer: [UInt8] = []
 
-    private var writeContinuation: CheckedContinuation<ProtocolResponse, Error>?
+    private var writeContinuation: CheckedContinuation<ProtocolResult, Error>?
     private var connectionContinuation: CheckedContinuation<Void, Error>?
 
     private static let logger = LoggingUtil.logger
 
-    init(
-        with writable: WritableTL,
-        privateKey: PrivateKey,
-        publicKey: PublicKey,
-        delegate: ProtocolManagerDelegate
-    ) {
+    init(with writable: WritableTL, privateKey: PrivateKey, publicKey: PublicKey) {
         self.privateKey = privateKey
         self.publicKey = publicKey
 
         self.writable = writable
         self.writable.writableDelegate = self
         self.writable.connectableDelegate = self
-
-        self.delegate = delegate
     }
 
     func setPrivateKey(_ key: PrivateKey) {
@@ -79,167 +72,76 @@ internal class ProtocolManager {
         }
     }
 
-    func startSession(withAccess data: [UInt8]) async throws -> ProtocolResponse {
-        return try await withCheckedThrowingContinuation { cont in
-            guard self.writeContinuation == nil else {
-                cont.resume(throwing: ProtocolError.ApiMisuse)
-                return
-            }
+    func startSession(withAccess data: [UInt8]) async throws -> ProtocolResult {
+        return try await self.withThrowingWriteContinuation {
+            let personalPublicKey = try self.privateKey.publicKey.rawRepresentation(format: .compressed)
 
-            do {
-                self.writeContinuation = cont
-                let personalPublicKey = try self.privateKey.publicKey.rawRepresentation(format: .compressed)
-                self.writeBuffer = [
-                    ProtocolConstant.StartSequence, personalPublicKey + data, ProtocolConstant.EndSequence,
-                ]
+            self.writeBuffer = [
+                ProtocolFrame.SessionStart, personalPublicKey + data, ProtocolFrame.SessionEnd,
+            ]
 
-                Self.logger.debug(
-                    "Start session data \(writeBuffer.description)",
-                    metadata: .protocol
-
-                )
-                try self.write()
-            }
-            catch {
-                cont.resume(throwing: error)
-                self.writeContinuation = nil
-            }
-        }
-    }
-
-    func sendCommand(withPayload data: [UInt8]) async throws -> ProtocolResponse {
-        return try await withCheckedThrowingContinuation { cont in
-            guard self.writeContinuation == nil else {
-                cont.resume(throwing: ProtocolError.ApiMisuse)
-                return
-            }
-
-            do {
-                self.writeContinuation = cont
-
-                let commandPayload = try Self.createCommand(
-                    withPayload: data,
-                    privateKey: self.privateKey,
-                    publicKey: self.publicKey
-                )
-                self.writeBuffer = [
-                    ProtocolConstant.StartSequence, commandPayload, ProtocolConstant.EndSequence,
-                ]
-
-                Self.logger.info(
-                    "Sending command data: \(writeBuffer.description)",
-                    metadata: .protocol
-
-                )
-                try self.write()
-            }
-            catch {
-                cont.resume(throwing: error)
-                self.writeContinuation = nil
-            }
-        }
-    }
-
-    private static func createCommand(
-        withPayload data: [UInt8],
-        privateKey: PrivateKey,
-        publicKey: PublicKey
-    ) throws -> [UInt8] {
-        var dataToEncrypt = [ProtocolMessageType.Request.rawValue]
-
-        dataToEncrypt.append(contentsOf: Date().timestamp.prefix(4))
-        dataToEncrypt.append(contentsOf: data)
-
-        do {
-            let nonce = try CryptoHelper.generateNonce(length: 16)
-            let sealedBox = try CryptoHelper.encrypt(
-                data: dataToEncrypt,
-                .init(privateKey: privateKey, publicKey: publicKey, nonce: nonce)
+            Self.logger.debug(
+                "Start session data: \(Data(writeBuffer.joined()).hexEncodedString)",
+                metadata: .protocol
             )
+            try self.write()
+        }
+    }
 
-            guard let encryptedData = sealedBox else {
+    func sendCommand(withPayload data: [UInt8]) async throws -> ProtocolResult {
+        return try await self.withThrowingWriteContinuation {
+            do {
+                let commandPayload = CommandRequestPayload(data: data)
+
+                let encryptedPacket = try EncryptedCommandPacket.encrypt(
+                    commandPayload.encode(),
+                    version: ProtocolVersion,
+                    privateKey: privateKey,
+                    publicKey: publicKey
+                ).encode()
+
+                self.writeBuffer = [
+                    ProtocolFrame.CommandStart, encryptedPacket, ProtocolFrame.CommandEnd,
+                ]
+            }
+            catch {
+                Self.logger.error(
+                    "Error while encrypting command data: \(error.localizedDescription)",
+                    metadata: .protocol
+                )
                 throw ProtocolError.Crypto
             }
 
-            var dataToWrite = Data()
-
-            dataToWrite.append(contentsOf: [ProtocolVersion])
-            dataToWrite.append(contentsOf: encryptedData.nonce)
-            dataToWrite.append(contentsOf: encryptedData.tag)
-            dataToWrite.append(contentsOf: encryptedData.ciphertext)
-
-            return [UInt8](dataToWrite)
-        }
-        catch {
-            Self.logger.error(
-                "Error while encrypting command data: \(error.localizedDescription)",
+            Self.logger.info(
+                "Sending command data: \(Data(writeBuffer.joined()).hexEncodedString)",
                 metadata: .protocol
             )
-            throw ProtocolError.Crypto
+
+            try self.write()
         }
     }
 
-    private static func decryptCommand(
-        withPayload data: [UInt8],
-        privateKey: PrivateKey,
-        publicKey: PublicKey
-    ) throws -> [UInt8]? {
-        do {
-            let nonce = [UInt8](data[1...16])
-            let tag = [UInt8](data[17...32])
-            let encryptedPayload = [UInt8](data[33...])
+    private func withThrowingWriteContinuation(_ body: () throws -> Void) async throws -> ProtocolResult {
+        return try await withCheckedThrowingContinuation { cont in
+            guard self.writeContinuation == nil else {
+                cont.resume(throwing: ProtocolError.ApiMisuse)
+                return
+            }
 
-            #if DEBUG
-                Self.logger.debug("Buffer length \(data.count)", metadata: .protocol)
-                Self.logger.debug("Nonce: \(Data(nonce).hexEncodedString)", metadata: .protocol)
-                Self.logger.debug("Tag: \(Data(tag).hexEncodedString)", metadata: .protocol)
-                Self.logger.debug(
-                    "Private key: \(Data(privateKey.rawRepresentation()).hexEncodedString)",
-                    metadata: .protocol
-                )
-            #endif
+            do {
+                self.writeContinuation = cont
 
-            return try CryptoHelper.decrypt(
-                cipherText: encryptedPayload,
-                .init(
-                    privateKey: privateKey,
-                    publicKey: publicKey,
-                    nonce: AES.GCM.Nonce(data: nonce),
-                    tag: tag
-                )
-            )
+                try body()
+            }
+            catch {
+                cont.resume(throwing: error)
+                self.writeContinuation = nil
+            }
         }
-        catch let err as CryptoKitError {
-            Self.logger.error("CryptoKit error \(err.description)", metadata: .protocol)
-        }
-        catch {
-            Self.logger.error("Error while decrypting data", metadata: .protocol)
-        }
-
-        throw ProtocolError.Crypto
-    }
-
-    private func processCommandResponse(payload: [UInt8]) {
-        let validity = payload[5]
-        let additionalPayload = [UInt8](payload[6...])
-
-        if validity == ProtocolConstant.Ack {
-            self.writeContinuation?.resume(
-                returning: .init(success: true, additionalPayload: additionalPayload)
-            )
-        }
-        else if validity == ProtocolConstant.Nack {
-            self.writeContinuation?.resume(
-                returning: .init(success: false, additionalPayload: additionalPayload)
-            )
-        }
-        else {
-            self.writeContinuation?.resume(throwing: ProtocolError.InvalidData)
-        }
-
-        self.writeContinuation = nil
     }
 }
+
+// MARK: Reading and writing handlers
 
 extension ProtocolManager: WritableTLDelegate {
     private func write() throws {
@@ -271,11 +173,7 @@ extension ProtocolManager: WritableTLDelegate {
             return
         }
 
-        #if DEBUG
-            Self.logger.debug("Writing data \(writeBuffer.description)", metadata: .protocol)
-        #else
-            Self.logger.info("Writing data", metadata: .protocol)
-        #endif
+        Self.logger.debug("Writing data: \(Data(nextChunk).hexEncodedString)", metadata: .protocol)
 
         try self.writable.write(data: nextChunk)
     }
@@ -317,7 +215,7 @@ extension ProtocolManager: WritableTLDelegate {
 
     func writable(didReceive data: [UInt8]?, _ error: Error?) {
         guard let receivedData = data, error == nil else {
-            Self.logger.error("Error while reading \(error.debugDescription))", metadata: .protocol)
+            Self.logger.error("Error while reading \(error.debugDescription)", metadata: .protocol)
 
             self.writeContinuation?.resume(throwing: error ?? ProtocolError.Generic)
             self.writeContinuation = nil
@@ -325,23 +223,17 @@ extension ProtocolManager: WritableTLDelegate {
             return
         }
 
-        Self.logger.debug("Did receive \(receivedData.description))", metadata: .protocol)
+        Self.logger.debug("Did receive \(Data(receivedData).hexEncodedString)", metadata: .protocol)
 
         switch receivedData {
-        case ProtocolConstant.StartSequence:
-            self.readBuffer = []
+        case ProtocolFrame.SessionStart, ProtocolFrame.CommandStart:
+            self.readBuffer = [UInt8](receivedData)
+        case ProtocolFrame.SessionEnd, ProtocolFrame.CommandEnd:
+            self.readBuffer += receivedData
+
             Self.logger.debug(
-                "Read start sequence: \(receivedData.description), skipping",
+                "Read end frame, closing",
                 metadata: .protocol
-
-            )
-
-            break
-        case ProtocolConstant.EndSequence:
-            Self.logger.debug(
-                "Read end sequence: \(receivedData.description), closing",
-                metadata: .protocol
-
             )
 
             do {
@@ -351,13 +243,11 @@ extension ProtocolManager: WritableTLDelegate {
                 Self.logger.error(
                     "Error while stop reading \(error.localizedDescription)",
                     metadata: .protocol
-
                 )
+
                 self.writeContinuation?.resume(throwing: error)
                 self.writeContinuation = nil
             }
-
-            break
         default:
             self.readBuffer += receivedData
         }
@@ -365,27 +255,26 @@ extension ProtocolManager: WritableTLDelegate {
 
     func writable(didStopReading: Bool, _ error: Error?) {
         do {
-            let decryptedData = try Self.decryptCommand(
-                withPayload: self.readBuffer,
-                privateKey: self.privateKey,
-                publicKey: self.publicKey
+            Self.logger.info("Received data: \(Data(self.readBuffer).hexEncodedString)", metadata: .protocol)
+
+            let startFrame = [UInt8](self.readBuffer.prefix(4))
+            let payload: [UInt8] = self.readBuffer.dropFirst(4).dropLast(4)
+
+            Self.logger.debug(
+                "DidStopReading start frame: \(startFrame.description)",
+                metadata: .protocol
             )
 
-            if let decryptedDataValue = decryptedData {
-                Self.logger.info(
-                    "Decrypted data \(Data(decryptedDataValue).hexEncodedString)",
-                    metadata: .protocol
-                )
-
-                self.processCommandResponse(payload: decryptedDataValue)
-            }
-            else {
-                throw ProtocolError.Generic
+            switch startFrame {
+            case ProtocolFrame.SessionStart, ProtocolFrame.CommandStart:
+                self.processEncryptedCommandResponse(try EncryptedCommandPacket(from: payload))
+            default:
+                throw ProtocolError.InvalidData("Invalid protocol start frame")
             }
         }
         catch {
             Self.logger.error(
-                "Error while stop reading \(error.localizedDescription)",
+                "Error while parsing packets \(error.localizedDescription)",
                 metadata: .protocol
             )
             self.writeContinuation?.resume(throwing: error)
@@ -401,6 +290,8 @@ extension ProtocolManager: WritableTLDelegate {
         self.writableState = state
     }
 }
+
+// MARK: Connection handlers
 
 extension ProtocolManager: ConnectableTLDelegate {
     func create(didCreate data: Any?, _ error: Error?) {
@@ -438,6 +329,53 @@ extension ProtocolManager: ConnectableTLDelegate {
         self.connectionContinuation = nil
     }
 }
+
+// MARK: Packet handlers
+
+extension ProtocolManager {
+    private func processEncryptedCommandResponse(_ packet: EncryptedCommandPacket) {
+        Self.logger.debug(
+            "Received encrypted command response \(Data(packet.data).hexEncodedString)",
+            metadata: .protocol
+        )
+
+        do {
+            let decryptedData = try packet.decrypt(privateKey: self.privateKey, publicKey: self.publicKey)
+            Self.logger.debug(
+                "Decrypted command data: \(Data(decryptedData).hexEncodedString)",
+                metadata: .protocol
+            )
+
+            let commandPayload = try CommandResponsePayload.init(from: decryptedData)
+
+            if commandPayload.commandIdentifier != .Error {
+                self.writeContinuation?.resume(
+                    returning: .success(
+                        .init(success: commandPayload.commandIdentifier == .Ack, additionalPayload: commandPayload.data)
+                    )
+                )
+            }
+            else {
+                let errorPayload = try ErrorCommandPayload.init(from: commandPayload.data)
+
+                self.writeContinuation?.resume(returning: .failure(errorPayload.errorCode))
+            }
+        }
+        catch let error as CryptoKitError {
+            Self.logger.error("CryptoKit error \(error.description)", metadata: .protocol)
+            self.writeContinuation?.resume(throwing: error)
+        }
+        catch {
+            Self.logger.error("Error while decrypting data \(error.localizedDescription)", metadata: .protocol)
+            self.writeContinuation?.resume(throwing: error)
+        }
+
+        self.writeContinuation = nil
+    }
+}
+
+// MARK: extensions
+extension ProtocolErrorCode: Error {}
 
 extension Logging.Logger.Metadata {
     fileprivate static var `protocol`: Self {

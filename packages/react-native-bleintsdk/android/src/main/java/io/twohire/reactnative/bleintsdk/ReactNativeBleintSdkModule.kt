@@ -70,7 +70,7 @@ class ReactNativeBleIntSdkModule(reactContext: ReactApplicationContext) :
             try {
                 getClientInstance().let {
                     promise.resolve(
-                        it.connectToVehicle(address, reactApplicationContext).toWritableMap()
+                        it.connectToVehicle(address)?.toWritableMap()
                     )
                 }
             } catch (sdkException: BLEIntSDKException) {

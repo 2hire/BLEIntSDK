@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = '2hire-K1'
-  s.version          = '0.0.6'
+  s.version          = '0.1.0'
   s.summary          = 'secp256k1 Elliptic Curve in Swift.'
 
   s.swift_version = '5'

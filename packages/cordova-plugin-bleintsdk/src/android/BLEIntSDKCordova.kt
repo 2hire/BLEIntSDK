@@ -92,13 +92,23 @@ class BLEIntSDKCordova : CordovaPlugin() {
             try {
                 getClientInstance().let {
                     val address = args.getString(0)
+                    val response = it.connectToVehicle(address)
 
-                    callbackContext.sendPluginResult(
-                        PluginResult(
-                            PluginResult.Status.OK,
-                            it.connectToVehicle(address, context).toJSONObject()
+                    if (response != null) {
+                        callbackContext.sendPluginResult(
+                            PluginResult(
+                                PluginResult.Status.OK,
+                                response.toJSONObject()
+                            )
                         )
-                    )
+                    } else {
+                        callbackContext.sendPluginResult(
+                            PluginResult(
+                                PluginResult.Status.OK,
+                                null as String?
+                            )
+                        )
+                    }
                 }
             } catch (e: BLEIntSDKException) {
                 e.printStackTrace()

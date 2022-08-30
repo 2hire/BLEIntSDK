@@ -5,9 +5,10 @@ import android.util.Base64
 import android.util.Log
 import io.twohire.bleintsdk.crypto.CryptoHelper
 import io.twohire.bleintsdk.crypto.KeyStore
+import io.twohire.bleintsdk.protocol.*
+import io.twohire.bleintsdk.protocol.ProtocolErrorCode
+import io.twohire.bleintsdk.protocol.ProtocolErrorCodeException
 import io.twohire.bleintsdk.protocol.ProtocolManager
-import io.twohire.bleintsdk.protocol.ProtocolManagerDelegate
-import io.twohire.bleintsdk.protocol.ProtocolResponse
 import io.twohire.bleintsdk.protocol.WritableTLState
 import io.twohire.bleintsdk.utils.BLEIntError
 import io.twohire.bleintsdk.utils.BLEIntSDKException
@@ -19,38 +20,38 @@ class Client {
     private val tag = "${Client::class.simpleName}@${System.identityHashCode(this)}"
 
     private var config: SessionConfig? = null
-
     private var manager: ProtocolManager? = null
-    private var writableStateHistory: List<WritableTLState> = mutableListOf()
 
     private var identifier: String? = null
+
+    private var context: Context? = null
 
     fun sessionSetup(context: Context, config: SessionConfig) {
         try {
             val keys = KeyStore.getOrGeneratePrivateKey(context)
             val vehiclePubKey = CryptoHelper.wrapPublicKey(config.publicKey.fromBase64ToByteArray())
 
+            this.context = context
             this.config = config
 
-            Log.d(tag, "Creating ProtocolManager")
+            Log.d(tag, "Creating ProtocolManager $config")
 
             this.manager =
                 ProtocolManager.getInstance(
                     context,
                     keys,
-                    vehiclePubKey,
-                    ManagerDelegate()
+                    vehiclePubKey
                 )
         } catch (error: Exception) {
             this.logAndMapError(error)
         }
     }
 
-    suspend fun connectToVehicle(macAddress: String, context: Context): CommandResponse =
+    suspend fun connectToVehicle(macAddress: String): CommandResponse? =
         this.catchInternalError {
             val manager = this.manager
             val sessionData = this.config
-            val command = sessionData?.commands?.get(CommandType.Noop)?.fromBase64ToByteArray()
+            val context = this.context
 
             if (manager == null) {
                 Log.e(tag, "Error while connecting to vehicle, manager is null")
@@ -62,50 +63,37 @@ class Client {
                 throw IllegalStateException(ClientError.INVALID_STATE.name)
             }
 
-            if (command == null) {
-                Log.e(tag, "Error while connecting to vehicle, command is null")
+            if (context == null) {
+                Log.e(tag, "Error while connecting to vehicle, context is null")
                 throw IllegalStateException(ClientError.INVALID_STATE.name)
             }
 
             this.identifier = macAddress
             this.connect()
 
-            var invalidNoopSession = false
-
-            Log.d(tag, "Sending Noop command to retrieve connection status")
-
             try {
+                val keyPair = KeyStore.getOrGeneratePrivateKey(context)
+                manager.setKeyPair(keyPair)
+
                 try {
-                    manager.sendCommand(command)
-                } catch (error: Exception) {
-                    Log.d(tag, "Noop failed, reconnecting")
+                    return@catchInternalError manager.startSession(sessionData.accessToken.fromBase64ToByteArray()).getOrThrow()
+                } catch (error: ProtocolErrorCodeException) {
+                    if (error.errorCode == ProtocolErrorCode.ALREADY_VALIDATED) {
+                        Log.i(tag, "Session is still valid")
 
-                    if (checkInvalidSession(writableStateHistory)) {
-                        invalidNoopSession = true
-                        Log.d(tag, "Noop failed for an INVALID_SESSION")
+                        return@catchInternalError null
                     }
+                    Log.e(tag, "Received protocol error code ${error.errorCode.rawValue}")
 
-                    manager.connect(macAddress)
-
-                    Log.d(tag, "Generating a new KeyPair")
-                    val keyPair = KeyStore.generateAndSaveKeyPair(context)
-                    manager.setKeyPair(keyPair)
-
-                    Log.d(tag, "Starting a new session")
-
-                    manager.startSession(sessionData.accessToken.fromBase64ToByteArray())
-                }
-            } catch (error: Exception) {
-                if (invalidNoopSession && checkInvalidSession(writableStateHistory)) {
-                    Log.d(
-                        tag,
-                        "ConnectToVehicle failed with two consecutive INVALID_SESSION errors"
-                    )
                     throw IllegalStateException(ClientError.INVALID_SESSION.name)
                 }
+            } catch (error: Exception) {
+                Log.e(tag, "Error while creating session, removing PrivateKey")
+                KeyStore.deletePrivatKey(context)
 
                 throw error
             }
+
         }
 
     suspend fun sendCommand(commandType: CommandType): CommandResponse =
@@ -138,15 +126,34 @@ class Client {
 
             Log.d(tag, "Sending command")
 
-            manager.sendCommand(command)
+            try {
+                return@catchInternalError manager.sendCommand(command).getOrThrow()
+            } catch (error: ProtocolErrorCodeException) {
+                Log.e(tag, "Received protocol error code ${error.errorCode.rawValue}")
+
+                throw IllegalStateException(ClientError.INVALID_COMMAND.name)
+            }
         }
 
     suspend fun endSession(): CommandResponse {
         val data = this.sendCommand(CommandType.EndSession)
+        val context = this.context
+
+        if (context != null) {
+           try {
+               Log.d(tag, "Session is closed, deleting PrivateKey")
+               KeyStore.deletePrivatKey(context)
+           } catch (error: Exception) {
+               Log.e(tag, "Error while deleting PrivateKey (${error.message})")
+           }
+       } else {
+           Log.e(tag, "Error context is null")
+       }
 
         this.config = null
         this.manager = null
         this.identifier = null
+        this.context = null
 
         return data
     }
@@ -190,12 +197,6 @@ class Client {
                     "[${it.code}]: ${if (internalError is ErrorDescription) internalError.description else internalError.message}"
                 )
             }
-
-    private inner class ManagerDelegate : ProtocolManagerDelegate {
-        override fun didChangeState(state: WritableTLState) {
-            this@Client.writableStateHistory += state
-        }
-    }
 }
 
 internal fun String.fromBase64ToByteArray(): ByteArray = try {

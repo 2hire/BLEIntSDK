@@ -5,5 +5,6 @@ enum class ProtocolError {
     API_MISUSE,
     INTERNAL,
     WRITABLE,
-    GENERIC
+    GENERIC,
+    INVALID_DATA
 }

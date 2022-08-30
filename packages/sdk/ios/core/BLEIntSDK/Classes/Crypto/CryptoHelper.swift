@@ -105,3 +105,26 @@ extension CryptoKitError {
         }
     }
 }
+
+internal class CRC32 {
+    public static let DefaultPoly: UInt32 = 0x04C1_1DB7
+    public static let DefaultInit: UInt32 = 0xFFFF_FFFF
+
+    public static func checksum(with buffer: [UInt8], poly: UInt32 = DefaultPoly, initValue: UInt32 = DefaultInit)
+        -> [UInt8]
+    {
+        return [UInt8].from(
+            value: Data(buffer).withUnsafeBytes { bytes in
+                return (0..<bytes.count).reduce(
+                    initValue,
+                    { crc, index in
+                        (0...7).reduce(
+                            crc ^ (UInt32(bytes[index]) << 24),
+                            { a, _ in a & 0x8000_0000 != 0 ? a << 1 ^ poly : a << 1 }
+                        )
+                    }
+                )
+            }
+        )
+    }
+}

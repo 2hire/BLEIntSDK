@@ -44,7 +44,3 @@ internal protocol WritableTLDelegate {
 
     func writable(didStopReading: Bool, _ error: Error?)
 }
-
-internal protocol ProtocolManagerDelegate {
-    func state(didChange state: WritableTLState)
-}

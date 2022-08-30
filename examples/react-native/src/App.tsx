@@ -3,7 +3,6 @@ import {ErrorCode} from '@2hire/bleintsdk-types';
 import * as SDK from '@2hire/react-native-bleintsdk';
 import {
   TEST_BOARD_COMMAND_END_SESSION,
-  TEST_BOARD_COMMAND_NOOP,
   TEST_BOARD_COMMAND_START,
   TEST_BOARD_COMMAND_STOP,
   TEST_BOARD_IDENTIFIER,
@@ -23,7 +22,6 @@ import {StartOfflineSessionResponse, TwoAAClient} from './utils/TwoAAHelper';
 const Commands: SDK.Commands = {
   start: TEST_BOARD_COMMAND_START,
   stop: TEST_BOARD_COMMAND_STOP,
-  noop: TEST_BOARD_COMMAND_NOOP,
   end_session: TEST_BOARD_COMMAND_END_SESSION,
 };
 
@@ -188,7 +186,6 @@ export default function App() {
                 {
                   start: '',
                   stop: '',
-                  noop: '',
                   end_session: '',
                   ...commands,
                 },
@@ -222,7 +219,6 @@ export default function App() {
                 {
                   start: '',
                   stop: '',
-                  noop: '',
                   end_session: '',
                   ...commands,
                 },

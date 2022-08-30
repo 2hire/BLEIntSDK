@@ -17,6 +17,7 @@ Error codes that SDKs can send.
 | `invalid_data`         | Bad data format while creating a Client instance.                                 |
 | `invalid_state`        | Client is not in the right state. E.g. calling any command before `sessionSetup`. |
 | `invalid_session`      | Session was refused by the board. E.g. might be already expired.                  |
+| `invalid_command`      | Command was refused by the board. E.g. encrypted payload might not be right.      |
 | `not_connected`        | Bluetooth is not in connected state.                                              |
 | `timeout`              | Bluetooth action timed out.                                                       |
 | `peripheral_not_found` | Bluetooth peripheral not found.                                                   |

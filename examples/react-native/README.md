@@ -46,7 +46,6 @@ During development can be useful to test the application with a board.
 | TEST_BOARD_PUBKEY              | Board public key            |
 | TEST_BOARD_COMMAND_START       | Start command payload       |
 | TEST_BOARD_COMMAND_STOP        | Stop command payload        |
-| TEST_BOARD_COMMAND_NOOP        | Noop command payload        |
 | TEST_BOARD_COMMAND_END_SESSION | End Session command payload |
 
 #### Using the application with 2hireAsAdapter
