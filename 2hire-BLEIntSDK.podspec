@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = '2hire-BLEIntSDK'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'SDK for BLE integratation'
 
   s.description      = <<-DESC

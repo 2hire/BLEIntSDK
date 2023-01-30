@@ -22,6 +22,33 @@ Add the plugin in package.json
 }
 ```
 
+### iOS setup
+
+The SDK uses Swift 5 and has a deployment target of iOS 13. Add these preferences in your Cordova `config.xml`:
+
+```xml
+<preference name="deployment-target" value="13" />
+<preference name="SwiftVersion" value="5" />
+```
+
+### Android setup
+
+The SDK uses `minSdkVersion` of 23 which is required to build the app.
+
+```xml
+<preference name="android-minSdkVersion" value="23" />
+```
+
+Since the core Android dependency is available through [JitPack](https://jitpack.io/#2hire/BLEIntSDK/Tag) it needs to be added to your repos.
+
+```gradle
+// platforms/android/app/repositories.gradle
+ext.repos = {
+    // ...
+    maven { url 'https://jitpack.io' }
+}
+```
+
 ## Usage
 
 ### Setup a new session
