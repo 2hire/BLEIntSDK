@@ -1,8 +1,15 @@
 
 
-### [0.1.1](https://github.com/2hire/BLEIntSDK/compare/v0.0.6...v0.1.0) (2023-01-30)
+### [0.1.2](https://github.com/2hire/BLEIntSDK/compare/v0.1.0...v0.1.1) (2023-02-07)
 
-## [0.1.0](https://github.com/2hire/BLEIntSDK/compare/v0.0.6...v0.1.0) (2022-08-30)
+### [0.1.1](https://github.com/2hire/BLEIntSDK/compare/v0.1.0...v0.1.1) (2023-01-30)
+
+### [0.1.2](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.1...v0.1.2) (2023-02-07)
+
+
+### Bug Fixes
+
+* **cordova:** case-sensitive paths ([4d07f40](https://github.com/2hire/BLEIntSDK-private/commit/4d07f409aaca5068723156e4f92a683f843a8acc))
 
 ### [0.1.1](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.0...v0.1.1) (2023-01-30)
 
