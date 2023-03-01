@@ -1,8 +1,20 @@
 
 
-### [0.1.2](https://github.com/2hire/BLEIntSDK/compare/v0.1.0...v0.1.1) (2023-02-07)
+### [0.1.3](https://github.com/2hire/BLEIntSDK/compare/v0.1.1...v0.1.2) (2023-03-01)
 
-### [0.1.1](https://github.com/2hire/BLEIntSDK/compare/v0.1.0...v0.1.1) (2023-01-30)
+### [0.1.2](https://github.com/2hire/BLEIntSDK/compare/v0.1.1...v0.1.2) (2023-02-07)
+
+### [0.1.3](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.2...v0.1.3) (2023-03-01)
+
+
+### Features
+
+* **android:** print error stacktrace ([efa82ea](https://github.com/2hire/BLEIntSDK-private/commit/efa82ea53f7b6278e8f857d33d6989c1faa69f97))
+
+
+### Bug Fixes
+
+* **android:** throw exception with sessionSetup ([517b8d1](https://github.com/2hire/BLEIntSDK-private/commit/517b8d100b0a57684f50312f40401e871e1f1ef2))
 
 ### [0.1.2](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.1...v0.1.2) (2023-02-07)
 

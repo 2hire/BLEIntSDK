@@ -24,6 +24,18 @@ Add the plugin in package.json
 
 ### iOS setup
 
+#### Permissions
+
+In order to your application to use bluetooth add Privacy - Location Always Usage Description key (empty value or not. It is better to define a value to a custom / more user-friendly message).
+
+```xml
+<edit-config file="*-Info.plist" mode="merge" overwrite="true" target="NSBluetoothAlwaysUsageDescription">
+    <string>testing</string>
+</edit-config>
+```
+
+#### Building setup
+
 The SDK uses Swift 5 and has a deployment target of iOS 13. Add these preferences in your Cordova `config.xml`:
 
 ```xml
@@ -33,10 +45,28 @@ The SDK uses Swift 5 and has a deployment target of iOS 13. Add these preference
 
 ### Android setup
 
+#### Permissions
+
+Add the service dependency in your app/AndroidManifest.xml
+
+```xml
+<config-file parent="/manifest/application" target="AndroidManifest.xml">
+    <service android:enabled="true" android:name="io.twohire.bleintsdk.bluetooth.BluetoothLeService" />
+ </config-file>
+```
+
+#### Building setup
+
 The SDK uses `minSdkVersion` of 23 which is required to build the app.
 
 ```xml
 <preference name="android-minSdkVersion" value="23" />
+```
+
+The SDK uses Kotlin so the Cordova plugin must be enabled.
+
+```xml
+<preference name="GradlePluginKotlinEnabled" value="true" />
 ```
 
 Since the core Android dependency is available through [JitPack](https://jitpack.io/#2hire/BLEIntSDK/Tag) it needs to be added to your repos.

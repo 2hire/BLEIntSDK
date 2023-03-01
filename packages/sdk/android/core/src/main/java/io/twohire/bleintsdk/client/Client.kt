@@ -43,7 +43,7 @@ class Client {
                     vehiclePubKey
                 )
         } catch (error: Exception) {
-            this.logAndMapError(error)
+            throw BLEIntSDKException(this.logAndMapError(error))
         }
     }
 
@@ -194,7 +194,7 @@ class Client {
             .also {
                 Log.e(
                     tag,
-                    "[${it.code}]: ${if (internalError is ErrorDescription) internalError.description else internalError.message}"
+                    "[${it.code}]: ${if (internalError is ErrorDescription) internalError.description else internalError.message}\n${internalError.stackTraceToString()}"
                 )
             }
 }
