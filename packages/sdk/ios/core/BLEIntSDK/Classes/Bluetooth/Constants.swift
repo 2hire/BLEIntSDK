@@ -15,8 +15,8 @@ internal enum BluetoothConstants {
     static let ReadCharacteristic = "92B867E8-2AA3-5D9E-C94D-F06338E6B4F8"
     static let Mtu = 20
 
-    static let ConnectionTimeout = 20.0
-    static let StartupTimeout = 5.0
+    static let ConnectionTimeout = 45.0
+    static let StartupTimeout = 45.0
     static let WriteResponseTimeout = 20.0
     static let ReadTimeout = 60.0
 }

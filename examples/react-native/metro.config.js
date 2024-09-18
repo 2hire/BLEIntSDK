@@ -1,22 +1,23 @@
-/**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
- *
- * @format
- */
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
 const path = require('path');
 const blacklist = require('metro-config/src/defaults/exclusionList');
 const escape = require('escape-string-regexp');
 const pak = require('../../packages/react-native-bleintsdk/package.json');
 
-const root = path.resolve(__dirname, '../../packages/react-native-bleintsdk');
-
 const modules = Object.keys({
   ...pak.peerDependencies,
 });
 
-module.exports = {
+const root = path.resolve(__dirname, '../../packages/react-native-bleintsdk');
+
+/**
+ * Metro configuration
+ * https://reactnative.dev/docs/metro
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
+const config = {
   projectRoot: __dirname,
   watchFolders: [root],
 
@@ -39,3 +40,5 @@ module.exports = {
     }),
   },
 };
+
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);

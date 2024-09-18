@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = '2hire-BLEIntSDK'
-  s.version          = '0.1.3'
+  s.version          = '0.1.4'
   s.summary          = 'SDK for BLE integratation'
 
   s.description      = <<-DESC
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.author           = { '2hire' => 'info@2hire.io' }
   s.source           = { :git => 'https://github.com/2hire/BLEIntSDK.git', :tag => 'v' + String(s.version.to_s) }
 
-  s.ios.deployment_target = '13.0'
+  s.ios.deployment_target = '15.0'
   s.swift_versions        = '5'
   s.module_name           = "BLEIntSDK"
 

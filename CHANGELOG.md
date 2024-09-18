@@ -1,8 +1,22 @@
 
 
-### [0.1.3](https://github.com/2hire/BLEIntSDK/compare/v0.1.1...v0.1.2) (2023-03-01)
+### [0.1.4](https://github.com/2hire/BLEIntSDK/compare/v0.1.2...v0.1.3) (2024-09-18)
 
-### [0.1.2](https://github.com/2hire/BLEIntSDK/compare/v0.1.1...v0.1.2) (2023-02-07)
+### [0.1.3](https://github.com/2hire/BLEIntSDK/compare/v0.1.2...v0.1.3) (2023-03-01)
+
+### [0.1.4](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.3...v0.1.4) (2024-09-18)
+
+
+### Features
+
+* bump actions and runners ([d5ba81e](https://github.com/2hire/BLEIntSDK-private/commit/d5ba81e528875f5c935cf16a13848956aad08102))
+
+
+### Bug Fixes
+
+* **android:** bluetooth connection timeout ([00a0666](https://github.com/2hire/BLEIntSDK-private/commit/00a06667cd5ac7c6c42494d70fa9ca5699954150))
+* **android:** context receiver registration ([a2ae71b](https://github.com/2hire/BLEIntSDK-private/commit/a2ae71b50ce6b192c86c9f6e42bb8fec507d355d))
+* increase connection timeouts ([8410c39](https://github.com/2hire/BLEIntSDK-private/commit/8410c39ed89ce6404bcc21277e4d99f93935df4a))
 
 ### [0.1.3](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.2...v0.1.3) (2023-03-01)
 

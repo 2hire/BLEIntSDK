@@ -1,10 +1,11 @@
 Pod::Spec.new do |s|
   s.name             = '2hire-secp256k1'
-  s.version          = '0.1.3'
+  s.version          = '0.1.4'
   s.summary          = 'secp256k1 Elliptic Curve'
 
   s.swift_version = '5'
   s.module_name   = 'secp256k1'
+  s.ios.deployment_target = '15.0'
 
   s.description      = <<-DESC
     libsecp256k1 (bitcoin-core/secp256k1), offering ECDSA, Schnorr (BIP340) and ECDH features.

@@ -3,7 +3,9 @@ package io.twohire.bleintsdk.protocol
 import android.content.*
 import android.os.IBinder
 import android.util.Log
+import androidx.core.content.ContextCompat
 import io.twohire.bleintsdk.bluetooth.BluetoothAction
+import io.twohire.bleintsdk.bluetooth.BluetoothError
 import io.twohire.bleintsdk.bluetooth.BluetoothLeService
 import io.twohire.bleintsdk.crypto.CryptoHelper
 import io.twohire.bleintsdk.crypto.ECKeyPair
@@ -73,11 +75,13 @@ internal class ProtocolManager private constructor(
                         }
                     }
                 }
+
                 BluetoothAction.ACTION_CONNECT_COMPLETE -> {
                     Log.d(tag, "Writable connected")
                     this@ProtocolManager.connectionContinuation?.resume(true)
                         .also { this@ProtocolManager.connectionContinuation = null }
                 }
+
                 BluetoothAction.ACTION_CONNECT_ERROR -> {
                     Log.e(tag, "Connection error")
 
@@ -95,6 +99,20 @@ internal class ProtocolManager private constructor(
                             this@ProtocolManager.connectionContinuation = null
                         }
                 }
+
+                BluetoothAction.ACTION_CONNECT_TIMEOUT -> {
+                    Log.e(tag, "Connection timeout error")
+
+                    this@ProtocolManager.connectionContinuation?.resumeWithException(
+                        IllegalStateException(
+                            BluetoothError.TIMEOUT_ERROR.name
+                        )
+                    )
+                        .also {
+                            this@ProtocolManager.connectionContinuation = null
+                        }
+                }
+
                 BluetoothAction.ACTION_WRITE_COMPLETE -> {
                     try {
                         this@ProtocolManager.writeBuffer =
@@ -107,6 +125,7 @@ internal class ProtocolManager private constructor(
                             .also { this@ProtocolManager.writeContinuation = null }
                     }
                 }
+
                 BluetoothAction.ACTION_WRITE_ERROR -> {
                     Log.e(tag, "Error while writing")
 
@@ -121,6 +140,7 @@ internal class ProtocolManager private constructor(
                         )
                     ).also { this@ProtocolManager.writeContinuation = null }
                 }
+
                 BluetoothAction.ACTION_READ_DATA -> {
                     val data = intent.getByteArrayExtra(BluetoothAction.ACTION_EXTRA_DATA)
 
@@ -145,6 +165,7 @@ internal class ProtocolManager private constructor(
                         ).also { this@ProtocolManager.writeContinuation = null }
                     }
                 }
+
                 BluetoothAction.ACTION_READ_ERROR -> {
                     Log.e(tag, "Error while reading")
 
@@ -160,6 +181,7 @@ internal class ProtocolManager private constructor(
                     )
                         .also { this@ProtocolManager.writeContinuation = null }
                 }
+
                 BluetoothAction.ACTION_READ_COMPLETE -> {
                     try {
                         Log.d(tag, "Stop read data: ${readBuffer.toHex()}")
@@ -237,16 +259,22 @@ internal class ProtocolManager private constructor(
             this.bluetoothLeServiceConn = connection
         }
 
-        context.registerReceiver(this.broadcastReceiver, IntentFilter().apply {
-            addAction(BluetoothAction.ACTION_STATE_CHANGED)
-            addAction(BluetoothAction.ACTION_CONNECT_COMPLETE)
-            addAction(BluetoothAction.ACTION_CONNECT_ERROR)
-            addAction(BluetoothAction.ACTION_WRITE_COMPLETE)
-            addAction(BluetoothAction.ACTION_WRITE_ERROR)
-            addAction(BluetoothAction.ACTION_READ_COMPLETE)
-            addAction(BluetoothAction.ACTION_READ_DATA)
-            addAction(BluetoothAction.ACTION_READ_ERROR)
-        })
+        ContextCompat.registerReceiver(
+            context,
+            this.broadcastReceiver,
+            IntentFilter().apply {
+                addAction(BluetoothAction.ACTION_STATE_CHANGED)
+                addAction(BluetoothAction.ACTION_CONNECT_COMPLETE)
+                addAction(BluetoothAction.ACTION_CONNECT_TIMEOUT)
+                addAction(BluetoothAction.ACTION_CONNECT_ERROR)
+                addAction(BluetoothAction.ACTION_WRITE_COMPLETE)
+                addAction(BluetoothAction.ACTION_WRITE_ERROR)
+                addAction(BluetoothAction.ACTION_READ_COMPLETE)
+                addAction(BluetoothAction.ACTION_READ_DATA)
+                addAction(BluetoothAction.ACTION_READ_ERROR)
+            },
+            ContextCompat.RECEIVER_EXPORTED
+        )
     }
 
     suspend fun connect(id: String) = suspendCoroutine<Boolean> { cont ->

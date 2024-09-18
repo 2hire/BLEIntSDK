@@ -57,10 +57,10 @@ Add the service dependency in your app/AndroidManifest.xml
 
 #### Building setup
 
-The SDK uses `minSdkVersion` of 23 which is required to build the app.
+The SDK uses `minSdkVersion` of 26 which is required to build the app.
 
 ```xml
-<preference name="android-minSdkVersion" value="23" />
+<preference name="android-minSdkVersion" value="26" />
 ```
 
 The SDK uses Kotlin so the Cordova plugin must be enabled.

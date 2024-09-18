@@ -168,7 +168,7 @@ internal class BluetoothLeService : Service(), WritableTL {
                                 Log.d(tag, "Received data is empty!")
                             }
 
-                            var value = data.value?.let {
+                            val value = data.value?.let {
                                 startingReadCharacteristicValue?.let { bytes ->
                                     return@let bytes + it
                                 } ?: it
@@ -345,7 +345,7 @@ internal class BluetoothLeService : Service(), WritableTL {
             this@BluetoothLeService.state = WritableTLState.Unknown
 
             broadcastUpdate(
-                Intent(BluetoothAction.ACTION_CONNECT_ERROR).putExtra(
+                Intent(BluetoothAction.ACTION_CONNECT_TIMEOUT).putExtra(
                     BluetoothAction.ACTION_EXTRA_DATA,
                     BluetoothError.TIMEOUT_ERROR.ordinal
                 )

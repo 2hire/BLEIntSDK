@@ -5,8 +5,8 @@ internal object BluetoothConstants {
     const val READ_CHARACTERISTIC = "92B867E8-2AA3-5D9E-C94D-F06338E6B4F8"
     const val WRITE_CHARACTERISTIC = "92B867E8-2AA3-5D9E-C94D-F06338E6B4E8"
 
-    const val SCAN_TIMEOUT = 35_000L
-    const val CONNECTION_TIMEOUT = 15_000L
+    const val SCAN_TIMEOUT = 45_000L
+    const val CONNECTION_TIMEOUT = 45_000L
     const val DISCONNECTION_TIMEOUT = 7_500L
     const val WRITE_RESPONSE_TIMEOUT = 20_000L
     const val READ_TIMEOUT = 60_000L
@@ -19,6 +19,7 @@ internal object BluetoothAction {
     const val ACTION_STATE_CHANGED = "io.twohire.bleintsdk.bluetooth.ACTION_STATE_CHANGED"
 
     const val ACTION_CONNECT_COMPLETE = "io.twohire.bleintsdk.bluetooth.ACTION_CONNECT_COMPLETE"
+    const val ACTION_CONNECT_TIMEOUT = "io.twohire.bleintsdk.bluetooth.ACTION_CONNECT_TIMEOUT"
     const val ACTION_CONNECT_ERROR = "io.twohire.bleintsdk.bluetooth.ACTION_CONNECT_ERROR"
 
     const val ACTION_WRITE_COMPLETE = "io.twohire.bleintsdk.bluetooth.ACTION_WRITE_COMPLETE"
