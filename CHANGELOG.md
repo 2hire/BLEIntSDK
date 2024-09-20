@@ -1,8 +1,24 @@
 
 
-### [0.1.4](https://github.com/2hire/BLEIntSDK/compare/v0.1.2...v0.1.3) (2024-09-18)
+### [0.1.5](https://github.com/2hire/BLEIntSDK/compare/v0.1.3...v0.1.4) (2024-09-20)
 
-### [0.1.3](https://github.com/2hire/BLEIntSDK/compare/v0.1.2...v0.1.3) (2023-03-01)
+### [0.1.4](https://github.com/2hire/BLEIntSDK/compare/v0.1.3...v0.1.4) (2024-09-18)
+
+### [0.1.5](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.4...v0.1.5) (2024-09-20)
+
+
+### Features
+
+* **ios,example-rn,example-ios:** add vendored frameworks ([d246e55](https://github.com/2hire/BLEIntSDK-private/commit/d246e554c3352327954d6e01243987964ba67a7b))
+* **ios:** add K1 and secp256k1 as static frameworks ([526960d](https://github.com/2hire/BLEIntSDK-private/commit/526960dd5d97cda4fc783b3321ba756708aee788))
+
+
+### Bug Fixes
+
+* **ci:** pods release workflow ([3bb96a6](https://github.com/2hire/BLEIntSDK-private/commit/3bb96a603eea7112502710a6f92b3a6bcc47f53c))
+* **ci:** workflow release chain ([297e960](https://github.com/2hire/BLEIntSDK-private/commit/297e960ebdf08fcffa625caf8dce7134f91c3eba))
+* **example-ionic:** before build script ([9959836](https://github.com/2hire/BLEIntSDK-private/commit/99598363683ab87d5a5b39871d794c7f073bbbb2))
+* **ios:** update to new K1 signatures ([8bc4a8e](https://github.com/2hire/BLEIntSDK-private/commit/8bc4a8e88485dbdc818b1cbeed4c6b447d54f445))
 
 ### [0.1.4](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.3...v0.1.4) (2024-09-18)
 

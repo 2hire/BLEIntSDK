@@ -40,6 +40,7 @@
 		D13A22C028325BDE00A406E1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D13A22C228325C7C00A406E1 /* BLEIntSDK_ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEIntSDK_ExampleApp.swift; sourceTree = "<group>"; };
 		D13A22C428325DB400A406E1 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		D1806BB12C9B46EB00D5A228 /* K1.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = K1.xcframework; path = "../../../k1-2/K1.xcframework"; sourceTree = "<group>"; };
 		D744DAEFFE3D28D3F74B7B93 /* Pods-BLEIntSDK_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLEIntSDK_Example.release.xcconfig"; path = "Target Support Files/Pods-BLEIntSDK_Example/Pods-BLEIntSDK_Example.release.xcconfig"; sourceTree = "<group>"; };
 		E0501D935BF8CE7360FA3289 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		E5B1C6C460F13FD56E047AE9 /* BLEIntSDK.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = BLEIntSDK.podspec; path = ../BLEIntSDK.podspec; sourceTree = "<group>"; };
@@ -68,6 +69,7 @@
 		54A7914B53B1537D00FC7892 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D1806BB12C9B46EB00D5A228 /* K1.xcframework */,
 				9870B6844337F3D967DACAE4 /* Pods_BLEIntSDK_Example.framework */,
 				4B75B8B9317E64B66BEAF3D2 /* Pods_BLEIntSDK_Tests.framework */,
 			);
@@ -171,8 +173,6 @@
 			dependencies = (
 			);
 			name = BLEIntSDK_Example;
-			packageProductDependencies = (
-			);
 			productName = BLEIntSDK;
 			productReference = 607FACD01AFB9204008FA782 /* BLEIntSDK_Example.app */;
 			productType = "com.apple.product-type.application";
@@ -229,8 +229,6 @@
 				Base,
 			);
 			mainGroup = 607FACC71AFB9204008FA782;
-			packageReferences = (
-			);
 			productRefGroup = 607FACD11AFB9204008FA782 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -268,17 +266,15 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-BLEIntSDK_Example/Pods-BLEIntSDK_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/2hire-BLEIntSDK/BLEIntSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/2hire-K1/K1.framework",
-				"${BUILT_PRODUCTS_DIR}/2hire-secp256k1/secp256k1.framework",
-				"${BUILT_PRODUCTS_DIR}/BigInt/BigInt.framework",
-				"${BUILT_PRODUCTS_DIR}/Logging/Logging.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/2hire-BLEIntSDK/K1.framework/K1",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/2hire-BLEIntSDK/secp256k1.framework/secp256k1",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/2hire-BLEIntSDK/Logging.framework/Logging",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BLEIntSDK.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/K1.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/secp256k1.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigInt.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Logging.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;

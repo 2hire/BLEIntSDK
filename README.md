@@ -27,8 +27,6 @@ Extended documentation can be found [here](docs/README.md).
 | Package                                            | Target     | Version                                                                                                             | License |
 | -------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------- | ------- |
 | [@2hire/bleintsdk-types](packages/bleintsdk-types) | Typescript | [![version](https://badgen.net/npm/v/@2hire/bleintsdk-types)](https://www.npmjs.com/package/@2hire/bleintsdk-types) | MIT     |
-| [2hire-K1](packages/sdk/ios/K1)                    | iOS        | [![version](https://badgen.net/cocoapods/v/2hire-K1)](https://cocoapods.org/pods/2hire-K1)                          | MIT     |
-| [2hire-secp256k1](packages/sdk/ios/secp256k1)      | iOS        | [![version](https://badgen.net/cocoapods/v/2hire-secp256k1)](https://cocoapods.org/pods/2hire-secp256k1)            | MIT     |
 
 ## Examples
 

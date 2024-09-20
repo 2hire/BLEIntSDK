@@ -16,8 +16,6 @@ end
 
 pod '2hire-react-native-bleintsdk', :path => './../../../packages/react-native-bleintsdk'
 pod '2hire-BLEIntSDK', :path => './../../..'
-pod '2hire-K1', :path => './../../..'
-pod '2hire-secp256k1', :path => './../../..'
 
 target 'ReactNativeBleintSdkExample' do
   config = use_native_modules!

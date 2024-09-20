@@ -21,7 +21,7 @@ class CryptoTests: XCTestCase {
         XCTAssertNotNil(privateKey)
         XCTAssertNotNil(privateKey.publicKey)
 
-        XCTAssertEqual(try privateKey.publicKey.rawRepresentation(format: .compressed).count, 33)
+        XCTAssertEqual(privateKey.publicKey.compressedRepresentation.count, 33)
     }
 
     func testEncryptAndDecryptWithTheSameKeyPair() throws {
@@ -67,7 +67,7 @@ class CryptoTests: XCTestCase {
         let publicKey = try CryptoHelper.wrapPublicKey(from: externalPublicKey)
 
         XCTAssertNotNil(publicKey)
-        XCTAssertEqual(try publicKey.rawRepresentation(format: .compressed), externalPublicKey)
+        XCTAssertEqual(publicKey.compressedRepresentation, Data(externalPublicKey))
     }
 
     func testEncryptAndDecryptWithExternalPublicKey() throws {

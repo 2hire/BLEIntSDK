@@ -34,7 +34,7 @@ internal class KeychainHelper {
         var timestamp = key.timestamp
         let valueData =
             Data(bytes: &timestamp, count: MemoryLayout<Double>.size)
-            + Data(key.privateKey.rawRepresentation())
+            + Data(key.privateKey.rawRepresentation)
 
         let saveQuery =
             [

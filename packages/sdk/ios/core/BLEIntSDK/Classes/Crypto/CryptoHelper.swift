@@ -4,6 +4,7 @@
 //  Copyright © 2022 2hire.io. All rights reserved.
 //
 
+import CryptoKit
 import Foundation
 import K1
 
@@ -12,7 +13,7 @@ internal class CryptoHelper {
 
     /// Generate a new Private and Public key pair.
     static func generatePrivateKey() throws -> PrivateKey {
-        return try K1.PrivateKey.generateNew()
+        return PrivateKey.init()
     }
 
     /// Generate a new nonce array.
@@ -26,11 +27,11 @@ internal class CryptoHelper {
 
     /// Wrap a UInt8 array to a PublicKey
     static func wrapPublicKey(from key: [UInt8]) throws -> PublicKey {
-        return try K1.PublicKey.import(from: key)
+        return try PublicKey.init(compressedRepresentation: key)
     }
 
     static func wrapPrivateKey(from key: [UInt8]) throws -> PrivateKey {
-        return try K1.PrivateKey.import(rawRepresentation: key)
+        return try PrivateKey.init(rawRepresentation: key)
     }
 
     /// Decrypt data using AES.GCM

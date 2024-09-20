@@ -4,18 +4,19 @@
 //  Copyright © 2022 2hire.io. All rights reserved.
 //
 
+import CryptoKit
 import Foundation
 import K1
 
-public typealias PrivateKey = K1.PrivateKey
-public typealias PublicKey = K1.PublicKey
+public typealias PrivateKey = K1.KeyAgreement.PrivateKey
+public typealias PublicKey = K1.KeyAgreement.PublicKey
 
 extension PrivateKey {
     /// Generate symmetric key between this and a PublicKey
     /// - Parameter publicKey
     /// - Returns: Symmetric key
     func symmetricKey(with publicKey: PublicKey) throws -> SymmetricKey {
-        let sharedSecret = try self.sharedSecret(with: publicKey).dropFirst().dropLast(32)
+        let sharedSecret = try self.ecdhPoint(with: publicKey).dropFirst().dropLast(32)
         let hashedSecret = SHA256.hash(data: sharedSecret)
 
         return SymmetricKey(data: hashedSecret)

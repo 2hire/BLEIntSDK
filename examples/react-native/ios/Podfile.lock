@@ -1,15 +1,8 @@
 PODS:
-  - 2hire-BLEIntSDK (0.1.3):
-    - 2hire-K1 (= 0.1.3)
-    - Logging (~> 1.4)
-  - 2hire-K1 (0.1.3):
-    - 2hire-secp256k1 (= 0.1.3)
-    - BigInt (~> 5.2)
-  - 2hire-react-native-bleintsdk (0.1.3):
-    - 2hire-BLEIntSDK (~> 0.1.3)
+  - 2hire-BLEIntSDK (0.1.4)
+  - 2hire-react-native-bleintsdk (0.1.4):
+    - 2hire-BLEIntSDK (~> 0.1.4)
     - React-Core
-  - 2hire-secp256k1 (0.1.3)
-  - BigInt (5.2.0)
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.75.3)
@@ -18,7 +11,6 @@ PODS:
   - hermes-engine (0.75.3):
     - hermes-engine/Pre-built (= 0.75.3)
   - hermes-engine/Pre-built (0.75.3)
-  - Logging (1.4.0)
   - RCT-Folly (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -1516,9 +1508,7 @@ PODS:
 
 DEPENDENCIES:
   - 2hire-BLEIntSDK (from `./../../..`)
-  - 2hire-K1 (from `./../../..`)
   - 2hire-react-native-bleintsdk (from `./../../../packages/react-native-bleintsdk`)
-  - 2hire-secp256k1 (from `./../../..`)
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -1587,19 +1577,13 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - BigInt
-    - Logging
     - SocketRocket
 
 EXTERNAL SOURCES:
   2hire-BLEIntSDK:
     :path: "./../../.."
-  2hire-K1:
-    :path: "./../../.."
   2hire-react-native-bleintsdk:
     :path: "./../../../packages/react-native-bleintsdk"
-  2hire-secp256k1:
-    :path: "./../../.."
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -1729,18 +1713,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  2hire-BLEIntSDK: f4ab4e9d3cdfa8637ad3aabdaea01b41f1b178e0
-  2hire-K1: a56aaf7976f8ad726ecce61bb32855dfeaa5c223
-  2hire-react-native-bleintsdk: 3380e221d45078d33eb4e072c66d2bc6e79727cb
-  2hire-secp256k1: c398cdf3849ea25044e9bdc742426d189858819e
-  BigInt: f668a80089607f521586bbe29513d708491ef2f7
+  2hire-BLEIntSDK: 4bfb9bb1eee718f6a5e5481acfb31c127b670864
+  2hire-react-native-bleintsdk: 58b2a8bdf9a6566fdbcebf550a4f3680e5638559
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
   FBLazyVector: 7b438dceb9f904bd85ca3c31d64cce32a035472b
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: 476ee3e89abb49e07f822b48323c51c57124b572
   hermes-engine: 8d2103d6c0176779aea4e25df6bb1410f9946680
-  Logging: beeb016c9c80cf77042d62e83495816847ef108b
   RCT-Folly: 4464f4d875961fce86008d45f4ecf6cef6de0740
   RCTDeprecation: 4191f6e64b72d9743f6fe1a8a16e89e868f5e9e7
   RCTRequired: 9bb589570f2bb3abc6518761e3fd1ad9b7f7f06c
@@ -1800,6 +1780,6 @@ SPEC CHECKSUMS:
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: 4ef80d96a5534f0e01b3055f17d1e19a9fc61b63
 
-PODFILE CHECKSUM: 4a1c08d90b78bb0c88245c7e5f25a56591169a65
+PODFILE CHECKSUM: c27de88f4be8a22ba98c5f5cbb97e66c81146e85
 
 COCOAPODS: 1.15.2

@@ -1,0 +1,568 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0 effective-5.10 (swiftlang-6.0.0.9.10 clang-1600.0.26.2)
+// swift-module-flags: -target arm64-apple-macos11.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name K1
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
+import CryptoKit
+import CryptoKit/*.Digest*/
+import CryptoKit/*.SHA256*/
+import CryptoKit/*.SharedSecret*/
+import Foundation
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import secp256k1
+public enum K1 {
+}
+extension K1 {
+  public enum KeyAgreement {
+  }
+}
+extension K1.KeyAgreement.PrivateKey {
+  public func sharedSecretFromKeyAgreement(with publicKey: K1.KeyAgreement.PrivateKey.PublicKey) throws -> CryptoKit.SharedSecret
+  public func ecdh(with publicKey: K1.KeyAgreement.PrivateKey.PublicKey, arbitraryData: Foundation.Data? = nil) throws -> CryptoKit.SharedSecret
+  public func ecdhPoint(with publicKey: K1.KeyAgreement.PrivateKey.PublicKey) throws -> Foundation.Data
+}
+extension K1 {
+  public enum ECDSA {
+  }
+}
+extension K1.ECDSA {
+  public struct ValidationOptions {
+    public let malleabilityStrictness: K1.ECDSA.ValidationOptions.MalleabilityStrictness
+    public init(malleabilityStrictness: K1.ECDSA.ValidationOptions.MalleabilityStrictness)
+  }
+}
+extension K1.ECDSA.ValidationOptions {
+  public static let `default`: K1.ECDSA.ValidationOptions
+  public enum MalleabilityStrictness {
+    case rejected
+    case accepted
+    public static func == (a: K1.ECDSA.ValidationOptions.MalleabilityStrictness, b: K1.ECDSA.ValidationOptions.MalleabilityStrictness) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSA {
+  public struct SigningOptions : Swift.Sendable, Swift.Hashable {
+    public let nonceFunction: K1.ECDSA.SigningOptions.NonceFunction
+    public init(nonceFunction: K1.ECDSA.SigningOptions.NonceFunction)
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.ECDSA.SigningOptions, b: K1.ECDSA.SigningOptions) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSA.SigningOptions {
+  public static let `default`: K1.ECDSA.SigningOptions
+  public enum NonceFunction : Swift.Sendable, Swift.Hashable {
+    case random
+    case deterministic(arbitraryData: K1.ECDSA.SigningOptions.NonceFunction.RFC6979ArbitraryData? = nil)
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.ECDSA.SigningOptions.NonceFunction, b: K1.ECDSA.SigningOptions.NonceFunction) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSA.SigningOptions.NonceFunction {
+  public struct RFC6979ArbitraryData : Swift.Sendable, Swift.Hashable {
+    public let arbitraryData: [Swift.UInt8]
+    public static let byteCount: Swift.Int
+    public init(arbitraryData: [Swift.UInt8]) throws
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.ECDSA.SigningOptions.NonceFunction.RFC6979ArbitraryData, b: K1.ECDSA.SigningOptions.NonceFunction.RFC6979ArbitraryData) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSA {
+  public struct Signature : Swift.Sendable, Swift.Hashable, Foundation.ContiguousBytes {
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSA.Signature {
+  public init(derRepresentation: some DataProtocol) throws
+  public init(rawRepresentation: some DataProtocol) throws
+}
+extension K1.ECDSA.Signature {
+  public func withUnsafeBytes<R>(_ body: (Swift.UnsafeRawBufferPointer) throws -> R) rethrows -> R
+}
+extension K1.ECDSA.Signature {
+  public var rawRepresentation: Foundation.Data {
+    get
+  }
+  public var derRepresentation: Foundation.Data {
+    get
+  }
+}
+extension K1.ECDSA.Signature {
+  public static func == (lhs: K1.ECDSA.Signature, rhs: K1.ECDSA.Signature) -> Swift.Bool
+}
+extension K1.ECDSA.Signature {
+  public func hash(into hasher: inout Swift.Hasher)
+}
+extension K1 {
+  public enum ECDSAWithKeyRecovery {
+  }
+}
+extension K1.ECDSAWithKeyRecovery {
+  public struct Signature : Swift.Sendable, Swift.Hashable, Foundation.ContiguousBytes {
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSAWithKeyRecovery.Signature {
+  public init(compact: K1.ECDSAWithKeyRecovery.Signature.Compact) throws
+}
+extension K1.ECDSAWithKeyRecovery.Signature {
+  public func withUnsafeBytes<R>(_ body: (Swift.UnsafeRawBufferPointer) throws -> R) rethrows -> R
+}
+extension K1.ECDSAWithKeyRecovery.Signature {
+  public func compact() throws -> K1.ECDSAWithKeyRecovery.Signature.Compact
+  public struct Compact : Swift.Sendable, Swift.Hashable {
+    public let compact: Foundation.Data
+    public let recoveryID: K1.ECDSAWithKeyRecovery.Signature.RecoveryID
+    public init(compact: Foundation.Data, recoveryID: K1.ECDSAWithKeyRecovery.Signature.RecoveryID) throws
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.ECDSAWithKeyRecovery.Signature.Compact, b: K1.ECDSAWithKeyRecovery.Signature.Compact) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSAWithKeyRecovery.Signature.Compact {
+  public static let byteCountRS: Swift.Int
+  public static let byteCount: Swift.Int
+  public init(rawRepresentation: some DataProtocol, format: K1.ECDSAWithKeyRecovery.Signature.Compact.SerializationFormat) throws
+  public enum SerializationFormat {
+    case rsv
+    public static let `default`: K1.ECDSAWithKeyRecovery.Signature.Compact.SerializationFormat
+    case vrs
+    public static func == (a: K1.ECDSAWithKeyRecovery.Signature.Compact.SerializationFormat, b: K1.ECDSAWithKeyRecovery.Signature.Compact.SerializationFormat) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public func serialize(format: K1.ECDSAWithKeyRecovery.Signature.Compact.SerializationFormat) -> Foundation.Data
+}
+extension K1.ECDSAWithKeyRecovery.Signature {
+  public func recoverPublicKey(message: some DataProtocol) throws -> K1.ECDSAWithKeyRecovery.PublicKey
+}
+extension K1.ECDSAWithKeyRecovery.Signature {
+  public func nonRecoverable() throws -> K1.ECDSA.Signature
+}
+extension K1.ECDSAWithKeyRecovery.Signature {
+  public static func == (lhs: K1.ECDSAWithKeyRecovery.Signature, rhs: K1.ECDSAWithKeyRecovery.Signature) -> Swift.Bool
+}
+extension K1.ECDSAWithKeyRecovery.Signature {
+  public func hash(into hasher: inout Swift.Hasher)
+}
+extension K1.ECDSAWithKeyRecovery.Signature {
+  public enum RecoveryID : Swift.UInt8, Swift.Sendable, Swift.Hashable, Swift.Codable {
+    case _0
+    case _1
+    case _2
+    case _3
+    public init?(rawValue: Swift.UInt8)
+    public typealias RawValue = Swift.UInt8
+    public var rawValue: Swift.UInt8 {
+      get
+    }
+  }
+}
+extension K1.ECDSAWithKeyRecovery.Signature.RecoveryID {
+  public init(byte: Swift.UInt8) throws
+  public init(recid: Swift.Int32) throws
+}
+extension K1.KeyAgreement {
+  public struct PrivateKey : Swift.Sendable, Swift.Hashable {
+    public typealias PublicKey = K1.KeyAgreement.PublicKey
+    public var publicKey: K1.KeyAgreement.PrivateKey.PublicKey {
+      get
+    }
+    public init()
+    public init(rawRepresentation: some ContiguousBytes) throws
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    public init(pemRepresentation: Swift.String) throws
+    public init(x963Representation: some ContiguousBytes) throws
+    public var rawRepresentation: Foundation.Data {
+      get
+    }
+    public var derRepresentation: Foundation.Data {
+      get
+    }
+    public var pemRepresentation: Swift.String {
+      get
+    }
+    public var x963Representation: Foundation.Data {
+      get
+    }
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.KeyAgreement.PrivateKey, b: K1.KeyAgreement.PrivateKey) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public struct PublicKey : Swift.Sendable, Swift.Hashable {
+    public init(rawRepresentation: some ContiguousBytes) throws
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    public init(pemRepresentation: Swift.String) throws
+    public init(x963Representation: some ContiguousBytes) throws
+    public init(compressedRepresentation: some ContiguousBytes) throws
+    public var rawRepresentation: Foundation.Data {
+      get
+    }
+    public var derRepresentation: Foundation.Data {
+      get
+    }
+    public var pemRepresentation: Swift.String {
+      get
+    }
+    public var x963Representation: Foundation.Data {
+      get
+    }
+    public var compressedRepresentation: Foundation.Data {
+      get
+    }
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.KeyAgreement.PublicKey, b: K1.KeyAgreement.PublicKey) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.Schnorr {
+  public struct PrivateKey : Swift.Sendable, Swift.Hashable {
+    public typealias PublicKey = K1.Schnorr.PublicKey
+    public var publicKey: K1.Schnorr.PrivateKey.PublicKey {
+      get
+    }
+    public init()
+    public init(rawRepresentation: some ContiguousBytes) throws
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    public init(pemRepresentation: Swift.String) throws
+    public init(x963Representation: some ContiguousBytes) throws
+    public var rawRepresentation: Foundation.Data {
+      get
+    }
+    public var derRepresentation: Foundation.Data {
+      get
+    }
+    public var pemRepresentation: Swift.String {
+      get
+    }
+    public var x963Representation: Foundation.Data {
+      get
+    }
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.Schnorr.PrivateKey, b: K1.Schnorr.PrivateKey) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public struct PublicKey : Swift.Sendable, Swift.Hashable {
+    public init(rawRepresentation: some ContiguousBytes) throws
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    public init(pemRepresentation: Swift.String) throws
+    public init(x963Representation: some ContiguousBytes) throws
+    public init(compressedRepresentation: some ContiguousBytes) throws
+    public var rawRepresentation: Foundation.Data {
+      get
+    }
+    public var derRepresentation: Foundation.Data {
+      get
+    }
+    public var pemRepresentation: Swift.String {
+      get
+    }
+    public var x963Representation: Foundation.Data {
+      get
+    }
+    public var compressedRepresentation: Foundation.Data {
+      get
+    }
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.Schnorr.PublicKey, b: K1.Schnorr.PublicKey) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSA {
+  public struct PrivateKey : Swift.Sendable, Swift.Hashable {
+    public typealias PublicKey = K1.ECDSA.PublicKey
+    public var publicKey: K1.ECDSA.PrivateKey.PublicKey {
+      get
+    }
+    public init()
+    public init(rawRepresentation: some ContiguousBytes) throws
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    public init(pemRepresentation: Swift.String) throws
+    public init(x963Representation: some ContiguousBytes) throws
+    public var rawRepresentation: Foundation.Data {
+      get
+    }
+    public var derRepresentation: Foundation.Data {
+      get
+    }
+    public var pemRepresentation: Swift.String {
+      get
+    }
+    public var x963Representation: Foundation.Data {
+      get
+    }
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.ECDSA.PrivateKey, b: K1.ECDSA.PrivateKey) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public struct PublicKey : Swift.Sendable, Swift.Hashable {
+    public init(rawRepresentation: some ContiguousBytes) throws
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    public init(pemRepresentation: Swift.String) throws
+    public init(x963Representation: some ContiguousBytes) throws
+    public init(compressedRepresentation: some ContiguousBytes) throws
+    public var rawRepresentation: Foundation.Data {
+      get
+    }
+    public var derRepresentation: Foundation.Data {
+      get
+    }
+    public var pemRepresentation: Swift.String {
+      get
+    }
+    public var x963Representation: Foundation.Data {
+      get
+    }
+    public var compressedRepresentation: Foundation.Data {
+      get
+    }
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.ECDSA.PublicKey, b: K1.ECDSA.PublicKey) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSAWithKeyRecovery {
+  public struct PrivateKey : Swift.Sendable, Swift.Hashable {
+    public typealias PublicKey = K1.ECDSAWithKeyRecovery.PublicKey
+    public var publicKey: K1.ECDSAWithKeyRecovery.PrivateKey.PublicKey {
+      get
+    }
+    public init()
+    public init(rawRepresentation: some ContiguousBytes) throws
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    public init(pemRepresentation: Swift.String) throws
+    public init(x963Representation: some ContiguousBytes) throws
+    public var rawRepresentation: Foundation.Data {
+      get
+    }
+    public var derRepresentation: Foundation.Data {
+      get
+    }
+    public var pemRepresentation: Swift.String {
+      get
+    }
+    public var x963Representation: Foundation.Data {
+      get
+    }
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.ECDSAWithKeyRecovery.PrivateKey, b: K1.ECDSAWithKeyRecovery.PrivateKey) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public struct PublicKey : Swift.Sendable, Swift.Hashable {
+    public init(rawRepresentation: some ContiguousBytes) throws
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    public init(pemRepresentation: Swift.String) throws
+    public init(x963Representation: some ContiguousBytes) throws
+    public init(compressedRepresentation: some ContiguousBytes) throws
+    public var rawRepresentation: Foundation.Data {
+      get
+    }
+    public var derRepresentation: Foundation.Data {
+      get
+    }
+    public var pemRepresentation: Swift.String {
+      get
+    }
+    public var x963Representation: Foundation.Data {
+      get
+    }
+    public var compressedRepresentation: Foundation.Data {
+      get
+    }
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.ECDSAWithKeyRecovery.PublicKey, b: K1.ECDSAWithKeyRecovery.PublicKey) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.Schnorr {
+  public struct Signature : Swift.Sendable, Swift.Hashable {
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.Schnorr.Signature, b: K1.Schnorr.Signature) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.Schnorr.Signature {
+  public init(rawRepresentation: some DataProtocol) throws
+}
+extension K1.Schnorr.Signature {
+  public var rawRepresentation: Foundation.Data {
+    get
+  }
+}
+extension K1 {
+  public enum Schnorr {
+  }
+}
+extension K1.Schnorr {
+  public struct SigningOptions : Swift.Sendable, Swift.Hashable {
+    public let auxiliaryRandomData: K1.Schnorr.SigningOptions.AuxiliaryRandomData
+    public init(auxiliaryRandomData: K1.Schnorr.SigningOptions.AuxiliaryRandomData = .default)
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.Schnorr.SigningOptions, b: K1.Schnorr.SigningOptions) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.Schnorr.SigningOptions {
+  public static let `default`: K1.Schnorr.SigningOptions
+  public enum AuxiliaryRandomData : Swift.Sendable, Swift.Hashable {
+    case none
+    case specific(K1.Schnorr.SigningOptions.AuxiliaryRandomData.Aux32)
+    case random
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.Schnorr.SigningOptions.AuxiliaryRandomData, b: K1.Schnorr.SigningOptions.AuxiliaryRandomData) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.Schnorr.SigningOptions.AuxiliaryRandomData {
+  public static let `default`: K1.Schnorr.SigningOptions.AuxiliaryRandomData
+  public struct Aux32 : Swift.Sendable, Swift.Hashable {
+    public let aux: [Swift.UInt8]
+    public static let byteCount: Swift.Int
+    public init(aux: some DataProtocol) throws
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.Schnorr.SigningOptions.AuxiliaryRandomData.Aux32, b: K1.Schnorr.SigningOptions.AuxiliaryRandomData.Aux32) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.ECDSA.PrivateKey {
+  public func signature(for hashed: some DataProtocol, options: K1.ECDSA.SigningOptions = .default) throws -> K1.ECDSA.Signature
+  public func signature(for digest: some Digest, options: K1.ECDSA.SigningOptions = .default) throws -> K1.ECDSA.Signature
+  public func signature(forUnhashed unhashed: some DataProtocol, options: K1.ECDSA.SigningOptions = .default) throws -> K1.ECDSA.Signature
+}
+extension K1.ECDSAWithKeyRecovery.PrivateKey {
+  public func signature(for hashed: some DataProtocol, options: K1.ECDSA.SigningOptions = .default) throws -> K1.ECDSAWithKeyRecovery.Signature
+  public func signature(for digest: some Digest, options: K1.ECDSA.SigningOptions = .default) throws -> K1.ECDSAWithKeyRecovery.Signature
+  public func signature(forUnhashed unhashed: some DataProtocol, options: K1.ECDSA.SigningOptions = .default) throws -> K1.ECDSAWithKeyRecovery.Signature
+}
+extension K1.Schnorr.PrivateKey {
+  public func signature(for hashed: some DataProtocol, options: K1.Schnorr.SigningOptions = .default) throws -> K1.Schnorr.Signature
+  public func signature(for digest: some Digest, options: K1.Schnorr.SigningOptions = .default) throws -> K1.Schnorr.Signature
+  public func signature(forUnhashed unhashed: some DataProtocol, options: K1.Schnorr.SigningOptions = .default) throws -> K1.Schnorr.Signature
+}
+extension K1.ECDSA.PublicKey {
+  public func isValidSignature(_ signature: K1.ECDSA.Signature, hashed: some DataProtocol, options: K1.ECDSA.ValidationOptions = .default) -> Swift.Bool
+  public func isValidSignature(_ signature: K1.ECDSA.Signature, digest: some Digest, options: K1.ECDSA.ValidationOptions = .default) -> Swift.Bool
+  public func isValidSignature(_ signature: K1.ECDSA.Signature, unhashed: some DataProtocol, options: K1.ECDSA.ValidationOptions = .default) -> Swift.Bool
+}
+extension K1.ECDSAWithKeyRecovery.PublicKey {
+  public func isValidSignature(_ signature: K1.ECDSAWithKeyRecovery.Signature, hashed: some DataProtocol, options: K1.ECDSA.ValidationOptions = .default) -> Swift.Bool
+  public func isValidSignature(_ signature: K1.ECDSAWithKeyRecovery.Signature, digest: some Digest, options: K1.ECDSA.ValidationOptions = .default) -> Swift.Bool
+  public func isValidSignature(_ signature: K1.ECDSAWithKeyRecovery.Signature, unhashed: some DataProtocol, options: K1.ECDSA.ValidationOptions = .default) -> Swift.Bool
+}
+extension K1.Schnorr.PublicKey {
+  public func isValidSignature(_ signature: K1.Schnorr.Signature, hashed: some DataProtocol) -> Swift.Bool
+  public func isValidSignature(_ signature: K1.Schnorr.Signature, digest: some Digest) -> Swift.Bool
+  public func isValidSignature(_ signature: K1.Schnorr.Signature, unhashed: some DataProtocol) -> Swift.Bool
+}
+extension Foundation.ContiguousBytes {
+  @inlinable internal var bytes: [Swift.UInt8] {
+    get {
+		withUnsafeBytes { pointer in
+			Array(pointer)
+		}
+	}
+  }
+}
+extension K1 {
+  public enum Error : Swift.Sendable, Swift.Error, Swift.Hashable {
+    case invalidKey
+    case incorrectKeySize
+    case invalidParameter
+    case incorrectParameterSize
+    case underlyingLibsecp256k1(error: Swift.Int)
+    case internalFailure(error: Swift.UInt)
+    public func hash(into hasher: inout Swift.Hasher)
+    public static func == (a: K1.Error, b: K1.Error) -> Swift.Bool
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+extension K1.Error : Swift.CustomDebugStringConvertible {
+  public var debugDescription: Swift.String {
+    get
+  }
+}
+extension K1 {
+  public enum ASN1Error : Swift.Error {
+    case invalidFieldIdentifier
+    case unexpectedFieldType
+    case invalidObjectIdentifier
+    case invalidASN1Object
+    case invalidASN1IntegerEncoding
+    case truncatedASN1Field
+    case unsupportedFieldLength
+    case invalidPEMDocument
+    public static func == (a: K1.ASN1Error, b: K1.ASN1Error) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+}
+@inlinable internal func safeCompare<LHS, RHS>(_ lhs: LHS, _ rhs: RHS) -> Swift.Bool where LHS : Foundation.ContiguousBytes, RHS : Foundation.ContiguousBytes {
+    lhs.withUnsafeBytes { lhsPtr in
+        rhs.withUnsafeBytes { rhsPtr in
+            constantTimeCompare(lhsPtr, rhsPtr)
+        }
+    }
+}
+@inlinable internal func constantTimeCompare<LHS, RHS>(_ lhs: LHS, _ rhs: RHS) -> Swift.Bool where LHS : Swift.Collection, RHS : Swift.Collection, LHS.Element == Swift.UInt8, RHS.Element == Swift.UInt8 {
+    guard lhs.count == rhs.count else {
+        return false
+    }
+
+    return zip(lhs, rhs).reduce(into: 0) { $0 |= $1.0 ^ $1.1 } == 0
+}
+extension K1.ECDSA.ValidationOptions.MalleabilityStrictness : Swift.Equatable {}
+extension K1.ECDSA.ValidationOptions.MalleabilityStrictness : Swift.Hashable {}
+extension K1.ECDSAWithKeyRecovery.Signature.Compact.SerializationFormat : Swift.Equatable {}
+extension K1.ECDSAWithKeyRecovery.Signature.Compact.SerializationFormat : Swift.Hashable {}
+extension K1.ECDSAWithKeyRecovery.Signature.RecoveryID : Swift.RawRepresentable {}
+extension K1.ASN1Error : Swift.Equatable {}
+extension K1.ASN1Error : Swift.Hashable {}

@@ -74,7 +74,7 @@ internal class ProtocolManager {
 
     func startSession(withAccess data: [UInt8]) async throws -> ProtocolResult {
         return try await self.withThrowingWriteContinuation {
-            let personalPublicKey = try self.privateKey.publicKey.rawRepresentation(format: .compressed)
+            let personalPublicKey = self.privateKey.publicKey.compressedRepresentation
 
             self.writeBuffer = [
                 ProtocolFrame.SessionStart, personalPublicKey + data, ProtocolFrame.SessionEnd,

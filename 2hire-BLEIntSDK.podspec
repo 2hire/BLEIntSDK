@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = '2hire-BLEIntSDK'
-  s.version          = '0.1.4'
+  s.version          = '0.1.5'
   s.summary          = 'SDK for BLE integratation'
 
   s.description      = <<-DESC
@@ -17,12 +17,10 @@ Pod::Spec.new do |s|
   s.swift_versions        = '5'
   s.module_name           = "BLEIntSDK"
 
-  s.source_files = 'packages/sdk/ios/core/BLEIntSDK/Classes/**/*'
-
-  s.dependency '2hire-K1', s.version.to_s
-  s.dependency 'Logging', '~> 1.4'
+  s.source_files        = 'packages/sdk/ios/core/BLEIntSDK/Classes/**/*'
+  s.vendored_frameworks = "packages/sdk/ios/frameworks/K1.xcframework", "packages/sdk/ios/frameworks/secp256k1.xcframework", "packages/sdk/ios/frameworks/Logging.xcframework"
 
   s.test_spec 'Tests' do |test_spec|
     test_spec.source_files = 'packages/sdk/ios/core/BLEIntSDK/Tests/**/*'
-  end  
+  end
 end
