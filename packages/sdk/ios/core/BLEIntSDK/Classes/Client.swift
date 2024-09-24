@@ -93,6 +93,11 @@ public class Client {
     }
 
     public func sendCommand(type: CommandType) async throws -> CommandResponse {
+        guard type != .EndSession
+        else {
+            throw BLEIntSDKError.InvalidCommand("Cannot send end_session command directly, use endSession() instead")
+        }
+
         return try await Self.catchInternalError {
             return try await self._sendCommand(type: type)
         }

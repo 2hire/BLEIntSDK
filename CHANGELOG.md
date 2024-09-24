@@ -1,8 +1,18 @@
 
 
-### [0.1.5](https://github.com/2hire/BLEIntSDK/compare/v0.1.3...v0.1.4) (2024-09-20)
+### [0.1.6](https://github.com/2hire/BLEIntSDK/compare/v0.1.4...v0.1.5) (2024-09-24)
 
-### [0.1.4](https://github.com/2hire/BLEIntSDK/compare/v0.1.3...v0.1.4) (2024-09-18)
+### [0.1.5](https://github.com/2hire/BLEIntSDK/compare/v0.1.4...v0.1.5) (2024-09-20)
+
+### [0.1.6](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.5...v0.1.6) (2024-09-24)
+
+
+### Bug Fixes
+
+* **android:** end_session command ([3ffe109](https://github.com/2hire/BLEIntSDK-private/commit/3ffe109960bbc93ccc7d628e8ee0854156ca7108))
+* **ios,android:** prevent sending end_session command ([3a1d3d5](https://github.com/2hire/BLEIntSDK-private/commit/3a1d3d5ca3550a31507e31165dc3da676a1d1174))
+* release script ([924614f](https://github.com/2hire/BLEIntSDK-private/commit/924614fb2b9a4ea07e491b1739d9f72821f79bc3))
+* release script ([523696d](https://github.com/2hire/BLEIntSDK-private/commit/523696d59094c5b6fca592783e1d142a2ed1e91e))
 
 ### [0.1.5](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.4...v0.1.5) (2024-09-20)
 

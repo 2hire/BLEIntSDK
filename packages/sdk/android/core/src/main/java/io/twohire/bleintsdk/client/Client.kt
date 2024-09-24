@@ -76,7 +76,8 @@ class Client {
                 manager.setKeyPair(keyPair)
 
                 try {
-                    return@catchInternalError manager.startSession(sessionData.accessToken.fromBase64ToByteArray()).getOrThrow()
+                    return@catchInternalError manager.startSession(sessionData.accessToken.fromBase64ToByteArray())
+                        .getOrThrow()
                 } catch (error: ProtocolErrorCodeException) {
                     if (error.errorCode == ProtocolErrorCode.ALREADY_VALIDATED) {
                         Log.i(tag, "Session is still valid")
@@ -89,73 +90,85 @@ class Client {
                 }
             } catch (error: Exception) {
                 Log.e(tag, "Error while creating session, removing PrivateKey")
-                KeyStore.deletePrivatKey(context)
+                KeyStore.deletePrivateKey(context)
 
                 throw error
             }
 
         }
 
-    suspend fun sendCommand(commandType: CommandType): CommandResponse =
-        this.catchInternalError {
-            val manager = this.manager
-            val sessionData = this.config
-            val command = sessionData?.commands?.get(commandType)?.fromBase64ToByteArray()
-
-            if (manager == null) {
-                Log.e(tag, "Error while sending command, manager is null")
-                throw IllegalStateException(ClientError.INVALID_STATE.name)
+    suspend fun sendCommand(commandType: CommandType): CommandResponse {
+        return this.catchInternalError {
+            if (commandType == CommandType.EndSession) {
+                Log.e(tag, "Cannot send end_session command directly, use endSession() instead")
+                throw IllegalArgumentException(ClientError.INVALID_COMMAND.name)
             }
 
-            if (sessionData == null) {
-                Log.e(tag, "Error while sending command, sessionData is null")
-                throw IllegalStateException(ClientError.INVALID_STATE.name)
-            }
-
-            if (command == null) {
-                Log.e(tag, "Error while sending command, command is null")
-                throw IllegalStateException(ClientError.INVALID_STATE.name)
-            }
-
-            if (manager.writableState != WritableTLState.Connected) {
-                Log.d(tag, "Connecting to vehicle")
-                this.connect()
-            } else {
-                Log.d(tag, "Vehicle is already connected, skipping")
-            }
-
-            Log.d(tag, "Sending command")
-
-            try {
-                return@catchInternalError manager.sendCommand(command).getOrThrow()
-            } catch (error: ProtocolErrorCodeException) {
-                Log.e(tag, "Received protocol error code ${error.errorCode.rawValue}")
-
-                throw IllegalStateException(ClientError.INVALID_COMMAND.name)
-            }
+            return@catchInternalError this.internalSendCommand(commandType)
         }
+    }
 
     suspend fun endSession(): CommandResponse {
-        val data = this.sendCommand(CommandType.EndSession)
-        val context = this.context
+        return this.catchInternalError {
+            val data = this.internalSendCommand(CommandType.EndSession)
+            val context = this.context
 
-        if (context != null) {
-           try {
-               Log.d(tag, "Session is closed, deleting PrivateKey")
-               KeyStore.deletePrivatKey(context)
-           } catch (error: Exception) {
-               Log.e(tag, "Error while deleting PrivateKey (${error.message})")
-           }
-       } else {
-           Log.e(tag, "Error context is null")
-       }
+            if (context != null) {
+                try {
+                    Log.d(tag, "Session is closed, deleting PrivateKey")
+                    KeyStore.deletePrivateKey(context)
+                } catch (error: Exception) {
+                    Log.e(tag, "Error while deleting PrivateKey (${error.message})")
+                }
+            } else {
+                Log.e(tag, "Error context is null")
+            }
 
-        this.config = null
-        this.manager = null
-        this.identifier = null
-        this.context = null
+            this.config = null
+            this.manager = null
+            this.identifier = null
+            this.context = null
 
-        return data
+            return@catchInternalError data
+        }
+    }
+
+    private suspend fun internalSendCommand(commandType: CommandType): CommandResponse {
+        val manager = this.manager
+        val sessionData = this.config
+        val command = sessionData?.commands?.get(commandType)?.fromBase64ToByteArray()
+
+        if (manager == null) {
+            Log.e(tag, "Error while sending command, manager is null")
+            throw IllegalStateException(ClientError.INVALID_STATE.name)
+        }
+
+        if (sessionData == null) {
+            Log.e(tag, "Error while sending command, sessionData is null")
+            throw IllegalStateException(ClientError.INVALID_STATE.name)
+        }
+
+        if (command == null) {
+            Log.e(tag, "Error while sending command, command is null")
+            throw IllegalStateException(ClientError.INVALID_STATE.name)
+        }
+
+        if (manager.writableState != WritableTLState.Connected) {
+            Log.d(tag, "Connecting to vehicle")
+            this.connect()
+        } else {
+            Log.d(tag, "Vehicle is already connected, skipping")
+        }
+
+        Log.d(tag, "Sending command ${commandType.rawValue}")
+
+        try {
+            return manager.sendCommand(command).getOrThrow()
+        } catch (error: ProtocolErrorCodeException) {
+            Log.e(tag, "Received protocol error code ${error.errorCode.rawValue}")
+
+            throw IllegalStateException(ClientError.INVALID_COMMAND.name)
+        }
     }
 
     private suspend fun connect() {

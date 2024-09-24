@@ -47,7 +47,7 @@ class KeyStore {
             return ECKeyPair(privateKey, publicKey)
         }
 
-        fun generateAndSaveKeyPair(context: Context): ECKeyPair {
+        private fun generateAndSaveKeyPair(context: Context): ECKeyPair {
             Log.d(tag, "Generating KeyPair")
 
             val keyPair = CryptoHelper.generateKeyPair()
@@ -67,7 +67,7 @@ class KeyStore {
             }
         }
 
-        fun deletePrivatKey(context: Context) = deleteKeyPair(getFile(context))
+        fun deletePrivateKey(context: Context) = deleteKeyPair(getFile(context))
 
         private fun deleteKeyPair(file: File) = file.apply { if (this.exists()) this.delete() }
 
