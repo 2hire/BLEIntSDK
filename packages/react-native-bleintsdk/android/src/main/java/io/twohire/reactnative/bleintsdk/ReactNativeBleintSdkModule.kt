@@ -90,13 +90,12 @@ class ReactNativeBleIntSdkModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun sendCommand(command: String, promise: Promise) =
+    fun sendCommand(command: String, promise: Promise) {
         this.scope.launch {
             try {
                 val commandType = CommandType.fromRawValue(command)
 
                 if (commandType !== null) {
-                    println(commandType.rawValue)
                     getClientInstance().let {
                         promise.resolve(
                             it.sendCommand(commandType).toWritableMap()
@@ -127,15 +126,14 @@ class ReactNativeBleIntSdkModule(reactContext: ReactApplicationContext) :
                 )
             }
         }
+    }
 
     @ReactMethod
-    fun endSession(promise: Promise) =
+    fun endSession(promise: Promise) {
         this.scope.launch {
             try {
                 getClientInstance().let {
-                    val response = it.endSession()
-
-                    promise.resolve(response.toWritableMap())
+                    promise.resolve(it.endSession().toWritableMap())
                 }
             } catch (sdkException: BLEIntSDKException) {
                 sdkException.printStackTrace()
@@ -151,12 +149,13 @@ class ReactNativeBleIntSdkModule(reactContext: ReactApplicationContext) :
                 promise.reject("error", "Something went wrong while ending session", error)
             }
         }
+    }
 }
 
 internal fun buildCommands(map: ReadableMap): Commands {
     val commands: MutableMap<CommandType, String> = mutableMapOf()
 
-    CommandType.values().forEach {
+    CommandType.entries.forEach {
         map.getString(it.rawValue)?.let { value ->
             commands[it] = value
         }
@@ -176,4 +175,3 @@ internal fun CommandResponse.toWritableMap(): WritableMap =
             )
         )
     }
-

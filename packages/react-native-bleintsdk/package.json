@@ -1,6 +1,6 @@
 {
   "name": "@2hire/react-native-bleintsdk",
-  "version": "0.1.7-beta.1",
+  "version": "0.1.7-beta.2",
   "description": "2hire BLEIntSDK React Native module",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -44,7 +44,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@2hire/bleintsdk-types": "0.1.7-beta.1"
+    "@2hire/bleintsdk-types": "0.1.7-beta.2"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^11.0.0",

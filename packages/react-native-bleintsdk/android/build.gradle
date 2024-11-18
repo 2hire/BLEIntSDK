@@ -132,6 +132,6 @@ dependencies {
   if (rootProject.name == "ReactNativeBleintSdkExample") {
     implementation project(":twohire-bleintsdk-android")
   } else {
-    implementation "com.github.2hire:BLEIntSDK:0.1.7-beta.1"
+    implementation "com.github.2hire:BLEIntSDK:0.1.7-beta.2"
   }
 }

@@ -1,8 +1,15 @@
 
 
-### [0.1.7-beta.1](https://github.com/2hire/BLEIntSDK/compare/v0.1.6...v0.1.7-beta.0) (2024-11-18)
+### [0.1.7-beta.2](https://github.com/2hire/BLEIntSDK/compare/v0.1.7-beta.0...v0.1.7-beta.1) (2024-11-18)
 
-### [0.1.7-beta.0](https://github.com/2hire/BLEIntSDK/compare/v0.1.6...v0.1.7-beta.0) (2024-11-18)
+### [0.1.7-beta.1](https://github.com/2hire/BLEIntSDK/compare/v0.1.7-beta.0...v0.1.7-beta.1) (2024-11-18)
+
+### [0.1.7-beta.2](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.7-beta.1...v0.1.7-beta.2) (2024-11-18)
+
+
+### Bug Fixes
+
+* **rn:** bridge function signatures ([a138586](https://github.com/2hire/BLEIntSDK-private/commit/a138586399fd144b7d3fa689cdf9c1c2d75a0a4d))
 
 ### [0.1.7-beta.1](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.7-beta.0...v0.1.7-beta.1) (2024-11-18)
 
