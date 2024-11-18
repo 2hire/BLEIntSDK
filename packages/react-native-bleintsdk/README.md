@@ -8,6 +8,32 @@ React Native bridge for BLEIntSDK
 npm install @2hire/react-native-bleintsdk
 ```
 
+### Android setup
+
+#### Permissions
+
+Add the service dependency in your app/AndroidManifest.xml
+
+```xml
+<config-file parent="/manifest/application" target="AndroidManifest.xml">
+    <service android:enabled="true" android:name="io.twohire.bleintsdk.bluetooth.BluetoothLeService" />
+ </config-file>
+```
+
+#### Building setup
+
+Since the core Android dependency is available through [JitPack](https://jitpack.io/#2hire/BLEIntSDK/Tag) it needs to be added to your repos.
+
+```gradle
+// platforms/android/app/repositories.gradle
+ext.repos = {
+    // ...
+    maven { url 'https://jitpack.io' }
+}
+```
+
+For more info on requirements and permissions see more on the Android package [here](../sdk/android/README.md)
+
 ## Usage
 
 ### Setup a new session

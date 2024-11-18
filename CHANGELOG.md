@@ -1,8 +1,16 @@
 
 
-### [0.1.6](https://github.com/2hire/BLEIntSDK/compare/v0.1.4...v0.1.5) (2024-09-24)
+### [0.1.7-beta.0](https://github.com/2hire/BLEIntSDK/compare/v0.1.5...v0.1.6) (2024-11-18)
 
-### [0.1.5](https://github.com/2hire/BLEIntSDK/compare/v0.1.4...v0.1.5) (2024-09-20)
+### [0.1.6](https://github.com/2hire/BLEIntSDK/compare/v0.1.5...v0.1.6) (2024-09-24)
+
+### [0.1.7-beta.0](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.6...v0.1.7-beta.0) (2024-11-18)
+
+
+### Bug Fixes
+
+* **android:** gradle build release ([65aafd4](https://github.com/2hire/BLEIntSDK-private/commit/65aafd44cffd2d7466dc8a8d852a61dc81debe01))
+* **rn:** ios dependency version ([ccf22f1](https://github.com/2hire/BLEIntSDK-private/commit/ccf22f1242699412c6788d537a79190e3256920d))
 
 ### [0.1.6](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.5...v0.1.6) (2024-09-24)
 
