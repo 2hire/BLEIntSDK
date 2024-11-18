@@ -1,6 +1,6 @@
 {
   "name": "@2hire/cordova-plugin-bleintsdk",
-  "version": "0.1.7-beta.0",
+  "version": "0.1.7-beta.1",
   "description": "2hire BLEIntSDK cordova-plugin",
   "types": "dist/BLEIntSDKCordova.d.ts",
   "main": "dist/BLEIntSDKCordova.js",
@@ -32,8 +32,10 @@
     "prepare": "tsc",
     "release": "npm publish --access public"
   },
+  "dependencies": {
+    "@2hire/bleintsdk-types": "0.1.7-beta.1"
+  },
   "devDependencies": {
-    "@2hire/bleintsdk-types": "0.1.7-beta.0",
     "@types/cordova": "^0.0.34",
     "@types/node": "^18.0.0",
     "typescript": "^4.7.4"

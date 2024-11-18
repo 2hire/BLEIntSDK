@@ -1,8 +1,15 @@
 
 
-### [0.1.7-beta.0](https://github.com/2hire/BLEIntSDK/compare/v0.1.5...v0.1.6) (2024-11-18)
+### [0.1.7-beta.1](https://github.com/2hire/BLEIntSDK/compare/v0.1.6...v0.1.7-beta.0) (2024-11-18)
 
-### [0.1.6](https://github.com/2hire/BLEIntSDK/compare/v0.1.5...v0.1.6) (2024-09-24)
+### [0.1.7-beta.0](https://github.com/2hire/BLEIntSDK/compare/v0.1.6...v0.1.7-beta.0) (2024-11-18)
+
+### [0.1.7-beta.1](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.7-beta.0...v0.1.7-beta.1) (2024-11-18)
+
+
+### Bug Fixes
+
+* **rn,cordova:** move @2hire/bleintsdk-types to dependencies ([5b4ff59](https://github.com/2hire/BLEIntSDK-private/commit/5b4ff5993c22ad6dc91ac4968a153ca42518a302))
 
 ### [0.1.7-beta.0](https://github.com/2hire/BLEIntSDK-private/compare/v0.1.6...v0.1.7-beta.0) (2024-11-18)
 
